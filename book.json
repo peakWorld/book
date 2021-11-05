@@ -1,0 +1,47 @@
+{
+  "root" : "./docs",
+  "structure" : {
+    "readme" : "MYINTRO.md"
+  },
+  "plugins": [
+    "-sharing",
+    "sharing-plus",
+    "code",
+    "copy-code-button",
+    "expandable-chapters",
+    "chapter-fold",
+    "-lunr", 
+    "-search", 
+    "search-pro",
+    "tbfed-pagefooter",
+    "back-to-top-button",
+    "splitter",
+    "lightbox",
+    "anchor-navigation-ex"
+  ],
+  "pluginsConfig": {
+    "sharing": {
+      "douban": false,
+      "facebook": false,
+      "google": true,
+      "pocket": false,
+      "qq": false,
+      "qzone": true,
+      "twitter": false,
+      "weibo": true,
+      "all": [
+        "douban", "facebook", "google", "instapaper", "linkedin","twitter", "weibo", 
+        "messenger","qq", "qzone","viber","whatsapp"
+      ]
+    },
+    "tbfed-pagefooter": {
+      "modify_label": "文件修订时间：",
+      "modify_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    "anchor-navigation-ex": {
+      "isShowTocTitleIcon": true,
+      "showLevel": false,
+      "showGoTop": false
+    }
+  }
+}
