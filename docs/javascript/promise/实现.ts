@@ -98,7 +98,6 @@ class IPromise {
   }
 
   then(onFulfilled: Callback, onRejected?: Callback) {
-    // eslint-disable-next-line
     onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : (v) => v;
     onRejected =
       typeof onRejected === 'function'

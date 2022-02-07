@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<link>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./a.css" ></link>
+</head>
+<body>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOMContentLoaded')
+    })
+  </script>
+  无痕浏览器中启动
+  <img src="https://wos.58cdn.com.cn/cDazYxWcDHJ/picasso/u9isgv6e.png" />
+  <script src="./a.js" ></script>
+  <script src="./b.js" defer></script>
+  <script src="./c.js" async></script>
+  <script src="./d.js" defer></script>
+  <div id="a"></div>
+</body>
+</html>
+
+<!--
+    #页面预解析
+      1. HTML解析器能够在文档流中预先加载脚本、层叠样式表和图片
+        html文档加载完成, 进行构建DOM树操作(占用了主线程); 
+        如果这样, 预加载扫描仪将解析可用的内容并请求高优先级资源(css、js等), 不会等到解析器找到外部资源引用时才请求它; 当解析器到达外部资源引用处, 它有可能在运行或已被下载。
+        这样就减少了主线程的阻塞
+      2. 将资源的请求提前, 变为并行加载。
+
+    2. scrip
+      1. 无属性脚本: 默认下载和执行都阻塞解析, 预解析提前下载
+      2. defer属性脚本: 文档解析完成后,才执行; 多个defer属性的脚本, 按脚本顺序执行; 所有defer属性脚本, 在DOMContentLoaded事件触发前执行完成
+      3. async属性脚本: 下载完成后, 就执行; 多个async属性的脚本, 无须执行; 所有async属性脚本, 在onload事件触发前执行完成
+
+    3. css
+      1. css加载不会阻塞html解析, css构建阻塞html解析; 预解析提前下载
+      2. css加载构建会阻塞渲染(渲染树由dom树和cssom树合成, 所有要渲染必须完成css的加载)
+      3. css加载构建会阻塞后面js的执行(如果同时下载css、js, 不管谁先完成加载, 都必须等待css加载构建完成, 才执行js代码)
+-->

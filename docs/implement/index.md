@@ -1,7 +1,30 @@
-* 问题一：为什么 [1, 2, 3].map(parseInt) 返回 [1,NaN,NaN]? 
+* 为什么 [1, 2, 3].map(parseInt) 返回 [1,NaN,NaN]? 
 ```js
 // map的cb函数接受三个值(value, i arr)
 // parseInt函数的第二个参数表示要解析的数字的基数。该值介于 2 ~ 36 之间。
 // 如果省略该参数或其值为 0，则数字将以 10 为基础来解析。如果它以 “0x” 或 “0X” 开头，将以 16 为基数。
 // 如果该参数小于 2 或者大于 36，则 parseInt() 将返回 NaN。
+```
+
+* 将平铺数据转成树形结构
+```js
+const arr = [
+  { id: 1, text: 'a1', pid: 0 }, { id: 2, text: 'a1', pid: 3 }, { id: 3, text: 'a1', pid: 2 },
+  { id: 4, text: 'a1', pid: 4 }, { id: 5, text: 'a1', pid: 0 }, { id: 6, text: 'a1', pid: 1 },
+  { id: 7, text: 'a1', pid: 2 }, { id: 8, text: 'a1', pid: 4 }, { id: 9, text: 'a1', pid: 5 },
+]
+// => 
+// {
+//   children: [
+//     {
+//       { id: 1, text: 'a1', pid: 0, children: [{ id: 6, text: 'a1', pid: 1 }] },
+//       { id: 9, text: 'a1', pid: 0 },
+//     }
+//   ]
+// }
+
+```
+
+* 手写call、apply、bind函数
+```js
 ```

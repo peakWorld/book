@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="content">
+    <div id="click">点击</div>
+  </div>
+  <script>
+    const content = document.getElementById('content')
+    const btn = document.getElementById('click')
+
+    // 同一事件的多个回调函数(有效, 阻止后续绑定的回调)
+    // btn.addEventListener('click', (e) => { console.log('a') }, false)
+    // btn.addEventListener('click', (e) => { e.stopImmediatePropagation(); console.log('b') }, false)
+    // btn.addEventListener('click', (e) => { console.log('c') }, false)
+    // a b
+
+    // 事件代理(包含阻止冒泡效果)
+    // content.addEventListener('click', (e) => { console.log('a') }, false)
+    // btn.addEventListener('click', (e) => { e.stopImmediatePropagation(); console.log('b') }, false)
+    // b
+
+    // 不同事件(不起效果)
+    btn.addEventListener('mousemove', (e) => { console.log('a') }, false)
+    btn.addEventListener('mouseenter', (e) => { e.stopImmediatePropagation(); console.log('b') }, false)
+    btn.addEventListener('mouseover', (e) => { console.log('c') }, false)
+    // c b a
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "module": "ESNext",
+    "target": "es2015",
+    "useDefineForClassFields": true,
+    /* Module Resolution Options */
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    /* Additional Checks */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
+    "alwaysStrict": true,
+    "preserveWatchOutput": true,
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "noEmit": true, // 不生成输出文件, 配合lint-staged阶段对ts错误进行检查
+    "skipLibCheck": true // 配合lint-staged阶段对ts错误进行检查, 不对node_module下的声明文件进行检查
+  },
+}

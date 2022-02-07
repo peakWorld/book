@@ -3,6 +3,9 @@
   "structure" : {
     "readme" : "MYINTRO.md"
   },
+  "styles" : {
+    "website": "./styles/website.css"
+  },
   "plugins": [
     "-sharing",
     "sharing-plus",
@@ -17,7 +20,9 @@
     "back-to-top-button",
     "splitter",
     "lightbox",
-    "anchor-navigation-ex"
+    "anchor-navigation-ex",
+    "edit-link",
+    "hide-element"
   ],
   "pluginsConfig": {
     "sharing": {
@@ -42,6 +47,13 @@
       "isShowTocTitleIcon": true,
       "showLevel": false,
       "showGoTop": false
+    },
+    "edit-link": {
+      "base": "//github.com/peakWorld/book/tree/master/docs",
+      "label": "编辑此页面"
+    },
+    "hide-element": {
+      "elements": [".gitbook-link", ".copyright"]
     }
   }
 }
