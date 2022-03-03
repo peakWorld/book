@@ -62,13 +62,7 @@ js脚本会操作dom元素, 如果修改dom属性的同时渲染界面, 那么�
 worker线程由渲染进程创建, 且无法操作dom元素。 js线程和worker线程通过postMessage Api来进行通信。
 worker线程单属于某个页面, 不会和其他页面共享
 
-### 渲染流程
-[简单过程](https://developer.mozilla.org/zh-CN/docs/Web/Performance/How_browsers_work)
-> 浏览器地址栏输入url地址, 主进程开一个下载线程; 进行http请求(DNS查询，IP寻址等等操作),等待响应、获取内容。再将内容通过RendererHost接口转交给Renderer进程。
-> Renderer进程开始渲染流程
-
 #### 资源加载
-
 * 页面预解析
   html文档加载完成后, 会进行dom树构建操作, 占用了渲染主线程。此时, 预加载器将解析可用内容, 并行请求css、js等资源。 解析器来到资源引用处时, 该资源可能已经在运行中或下载完了(不会等到解析器找到资源引用时才请求它)。这样就减少了主线程的阻塞。
   > 预解析功能, 将资源的请求提前, 变为并行加载.
