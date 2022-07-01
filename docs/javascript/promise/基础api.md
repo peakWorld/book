@@ -25,7 +25,7 @@
     .catch(error => console.log(error))
   // Error: fail
 ```
-* 调用resolve或reject并不会终结Promise参数函数的执行
+* 调用resolve或reject并不会终结Promise回调函数的执行
 ```ts
   new Promise((resolve) => {
     resolve(1)
@@ -36,7 +36,7 @@
   new Promise((resolve) => {
     return resolve(1)
     console.log(2)
-  }).then((res) => console.log(res))
+  }).then((res) => console.log(res)) // 1
 ```
 ## Promise.prototype.then
   * 实例添加状态改变时的回调函数
@@ -152,7 +152,7 @@
   const p2 = new Promise((resolve) => throw new Error('报错了'))
     .then(result => result)
     .catch(e => e)
-  // p2是调用catch后返回的promise实例, 此时已resolved
+  // p2是调用catch后返回的promise实例, 此时已rejected
 
   Promise.all([p1, p2]).then(result => console.log('result', result)).catch(e => console.log('e', e))
   // 触发的then回调

@@ -32,7 +32,7 @@
 ## Generator
 * 是协程在 ES6 的实现，最大特点就是可以交出函数的执行权（即暂停执行）
 ```ts
-  function gen() {
+  function *gen() {
     let x = yield 1
     console.log('x:', x)
   }
@@ -78,6 +78,7 @@
     yield* foo() 
     // moo中有返回值, 必须用赋值给个变量, 否则会忽略
     let me = yield* moo();
+    console.log('me', me)
     yield me
     yield 4
   }

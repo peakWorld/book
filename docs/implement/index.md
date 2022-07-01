@@ -118,3 +118,43 @@ function ctreateAjax (options) {
   })
 }
 ```
+
+## 防抖和节流
+```ts
+// 防抖
+function debounce (func, wait) {
+  let timer
+  return function (...args) {
+    if (timer) {
+      clearTimout(timer)
+    }
+    timer = setTimout(() => {
+      timer = null
+      func.apply(this, args)
+    }, wait)
+  }
+}
+
+// 节流
+function throttle (func, wait) {
+  let pre, timer
+  return function (...args) {
+    const current = Date.now()
+    if (!pre) pre = current
+    const remain = wait - (current - pre)
+    if (remain <= 0) {
+      if (timer) {
+        timer = null
+        clearTimout(timer)
+      }
+      func.appply(this, args)
+    } else if (!timer) {
+      timer = setTimout(() => {
+        timer = null
+        pre = Date.now()
+        func.appply(this, args)
+      }, remain)
+    }
+  }
+}
+```
