@@ -1,6 +1,62 @@
 # Es6
 * ES6（或 ES2015）是根据 2015里程碑 通过了第4阶段的一系列功能
 
+## 常用特性
+```js
+// 1. 默认参数
+function calc (w, h = 50) {}
+// 2. 模板对象
+const word = 'world'
+`hello ${word}`
+// 3. 多行字符串
+`
+  A
+  B
+`
+// 4. 解构赋值
+const { x, y: z } = { x: 1, y: 2 }
+const [a, b, c] = [x, z, 4]
+// 5. 箭头函数
+const arrow = () => {}
+  // 5.1 箭头函数语法简洁
+  // 5.2 不绑定this(无this),捕获所在上下文的this作为自身的this值
+  // 5.3 不能作为构造函数
+  // 5.4 call、apply、bind函数无法改变this指向
+  // 5.5 没有原型属性
+  // 5.6 不能直接返回对象字面量
+function test() {
+  return () => console.log('_this', this)
+}
+test.call({ x: 1 })() // _this {x : 1}  test函数中this指向{x:1}
+test()() // _this window test函数中this指向window
+
+
+// 6. promise
+// 7. 块作用域 let/const
+  // 7.1 不能重复声明同一名称的变量
+  // 7.2 变量不存在声明提升
+  // 7.3 const声明必须初始化
+// 8. 类 class
+// 9. 模块
+```
+
+## Map、Set、Object
+* Map(字典)
+  1. 以键值对的方式存储数据
+  2. 有序存储数据, Object是无序的
+  3. 键值可以是任意类型
+* Set(集合)
+  1. 存储不重复的值
+  2. 存储任何类型的数据
+```js
+// map初始化
+new Map([['name', '张三'], ['age', 20]])
+// set初始化
+new Set(['张三', 12, true]);
+
+// 实现原理 ·红黑树·
+```
+
 ## WeakMap
 * 只接受对象作为键名（null除外），不接受其他类型的值作为键名
 * WeakMap的键名所指向的对象，不计入垃圾回收机制

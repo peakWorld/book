@@ -5,4 +5,3 @@ async function test() {
   const c = await new Promise((resolve) => resolve(2))
   return "1"
 }
-

@@ -88,7 +88,7 @@ const effect = {
 effect => fiberEffectTag{UpdateEffect | PassiveEffect}; hookEffectTag{UnmountPassive | MountPassive}
 effectLayout => fiberEffectTag{UpdateEffect}; hookEffectTag{UnmountMutation | MountLayout}
 
-// componentUpdateQueue 指向本次渲染的effect链表最后一位
+// componentUpdateQueue.lastEffect = effect 指向本次渲染的effect链表最后一位
 
 fiber.memoizedState = firstWorkInProgressHook // 保存hook链表的首位
 fiber.updateQueue = componentUpdateQueue // effect循环链表的末尾
