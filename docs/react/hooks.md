@@ -8,6 +8,8 @@
 * 无需修改组件结构的情况下复用状态逻辑
 * 复杂组件无需按生命周期拆分逻辑, 只需将关联部分拆分成更小函数
 
+* 频繁生成函数
+
 ## useEffect 和 useEffectLayout
 * 都是用于处理副作用, useEffectLayout优先于useEffect执行
 * useEffect 在渲染过程中被异步调用, 用于绝大多数场景; 在屏幕像素改变之后执行。

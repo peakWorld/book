@@ -13,7 +13,7 @@ event loops就是把原料放上流水线的工人。
 *  宏任务
 整体的js代码、事件回调、XHR回调、定时器、IO操作，UI render
 
-*  微任务
+*  微任务 为了给紧急任务一个插队的机会
 promises、MutationObserver、process.nextTick、Object.observe
 
 ## 渲染
@@ -32,3 +32,6 @@ promises、MutationObserver、process.nextTick、Object.observe
 * 视图渲染的时机
   * 不是每轮事件循环都会执行视图更新，浏览器有自己的优化策略(例如把几次的视图更新累积到一起重绘)
   * requestAnimationFrame回调的执行时机是在一次或多次事件循环的UI render阶段, 不是每一帧都执行requestAnimationFrame回调
+
+## Node Event Loop
+https://juejin.cn/post/7073099307510923295
