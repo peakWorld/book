@@ -14,6 +14,7 @@ const obj = new Proxy(data, {
   set(target, key, newVal) {
     target[key] = newVal
     trigger(target, key) // 将副作用函数从‘桶’中取出并执行
+    return true
   }
 })
 
@@ -53,3 +54,5 @@ setTimeout(() => {
 setTimeout(() => {
   obj.msg = 'Hello Vue3...'
 }, 1000)
+
+window.bucket = bucket

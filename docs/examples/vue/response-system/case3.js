@@ -1,9 +1,9 @@
-// 1. 分支切换
+// 1. 分支切换、遗留副作用函数
 
 const bucket = new WeakMap()
 let activeEffect  // 全局变量存储被注册的副作用函数
 
-const data = { text: 'Hello World' }
+const data = { ok: true, text: 'Hello World' }
 
 const obj = new Proxy(data, {
   get(target, key) {
@@ -13,6 +13,7 @@ const obj = new Proxy(data, {
   set(target, key, newVal) {
     target[key] = newVal
     trigger(target, key)
+    return true
   }
 })
 
@@ -27,7 +28,7 @@ function track (target, key) {
     depsMap.set(key, deps = new Set())
   }
   deps.add(activeEffect)
-  activeEffect.deps.push(deps) // 将deps添加到activeEffect.deps数组中
+  activeEffect.deps.push(deps) // 将deps添加到activeEffect.deps数组中, 该deps和此时activeEffect存在依赖
 }
 
 function trigger (target, key) {
@@ -35,15 +36,17 @@ function trigger (target, key) {
   if (!depsMap) return
   const effects = depsMap.get(key)
 
+  // effects && effects.forEach(fn => fn()) // 导致无限循环
+
   const effectsToRun = new Set(effects) // 避免无限循环
   effectsToRun.forEach(effectFn => effectFn())
 }
 
 function effect(fn) {
   const effectFn = () => {
-    cleanup(effectFn) // 清除工作
-    activeEffect = effectFn // 设置副作用函数
-    fn()
+    cleanup(effectFn) // 清除工作, 在每次执行副作用函数前将它从所有与之关联的依赖结合中删除。
+    activeEffect = effectFn 
+    fn()  // 副作用函数执行完成, 重新建立联系, 不会包含遗留的副作用函数。
   }
   effectFn.deps = [] // 用来存储所有与该副作用函数相关联的依赖集合
   effectFn()
@@ -58,7 +61,7 @@ function cleanup (effectFn) {
 }
 
 effect(() => {
-  document.body.innerText = obj.text
+  document.body.innerText = obj.ok ? obj.text : 'not'
 })
 
 setTimeout(() => {
@@ -68,3 +71,10 @@ setTimeout(() => {
 setTimeout(() => {
   obj.msg = 'Hello Vue3...'
 }, 1000)
+
+
+// trigger函数中的 effects && effects.forEach(fn => fn()) 为什么导致无限循环？
+// 执行副作用函数
+  // 调用cleanup, 清除依赖关系
+  // 执行fn函数, 进行读取操作, 重新设置依赖
+  // 此时forEach循环未结束, 而effects又有值了, 继续执行forEach循环
