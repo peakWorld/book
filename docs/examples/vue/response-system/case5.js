@@ -1,11 +1,23 @@
-// 1. 嵌套effect
-// 2. 无限递归循环
+// 调度执行
 
 const bucket = new WeakMap()
-let activeEffect 
 const effectStack = []
-
 const data = { foo: 0 }
+let activeEffect 
+
+const jobQuene = new Set()  // 任务队列, set结构保证副作用函数不会重复
+const p = Promise.resolve() // promise实例, 将任务添加到微任务队列
+let isFlushing = false
+
+function flushJob() {
+  if (isFlushing) return 
+  isFlushing = true
+  p.then(() => { // 微任务队列, 在宏任务后执行
+    jobQuene.forEach(job => job())
+  }).finally(() => { // 当前宏任务期间, isFlushing始终为true; 
+    isFlushing = false
+  })
+}
 
 const obj = new Proxy(data, {
   get(target, key) {
@@ -37,29 +49,31 @@ function trigger (target, key) {
   const depsMap = bucket.get(target)
   if (!depsMap) return
   const effects = depsMap.get(key)
-
-  // const effectsToRun = new Set(effects)
-  // effectsToRun.forEach(effectFn => effectFn())
-
   const effectsToRun = new Set()
   effects && effects.forEach(effectFn => {
-    // trigger触发执行的副作用函数与当前正在执行的副作用函数相同, 则不触发
     if (effectFn !== activeEffect) {
       effectsToRun.add(effectFn)
     }
   })
-  effectsToRun.forEach(effectFn => effectFn())
+  effectsToRun.forEach(effectFn => {
+    if (effectFn.options.scheduler) { // 副作用函数存在调度器, 则调用该调度器
+      effectFn.options.scheduler(effectFn)
+    } else {
+      effectFn()
+    }
+  })
 }
 
-function effect(fn) {
+function effect(fn, options = {}) {
   const effectFn = () => {
     cleanup(effectFn)
     activeEffect = effectFn 
-    effectStack.push(effectFn) // 在副作用函数执行前将当前副作用函数压入栈中
+    effectStack.push(effectFn)
     fn()
-    effectStack.pop() // 在副作用函数执行后, 将当前副作用函数弹出栈
-    activeEffect = effectStack[effectStack.length - 1] // 还原activeEffect为之前的值
+    effectStack.pop()
+    activeEffect = effectStack[effectStack.length - 1]
   }
+  effectFn.options = options
   effectFn.deps = []
   effectFn()
 }
@@ -72,21 +86,22 @@ function cleanup (effectFn) {
   effectFn.deps.length = 0
 }
 
-// effect嵌套
-// let temp1, temp2
-// effect(function effectFn1() {
-//   console.log('effectFn1 执行')
-//   effect(function effectFn2() {
-//     console.log('effectFn2 执行')
-//     temp2 = obj.bar
-//   })
-//   temp1 = obj.foo
-// })
-// obj.foo = false
+effect(
+  () => {
+    console.log('foo', obj.foo)
+  },
+  {
+    scheduler(fn) { // 调度函数
+      // setTimeout(fn) // 副作用函数放到宏任务队列中
 
-// 无限递归循环
-// effect(() => {
-//   obj.foo++
-// })
+      jobQuene.add(fn)
+      flushJob()
+    }
+  }
+)
+
+// 多次变更值
+obj.foo++
+obj.foo++
 
 window.obj = data
