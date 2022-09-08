@@ -20,7 +20,7 @@ const obj = new Proxy(data, {
 })
 
 function track (target, key) {
-  if (!activeEffect) return
+  if (!activeEffect) return // 顶层effect调用后, activeEffect为空; effect外部的所用读取设置都直接返回
   let depsMap = bucket.get(target)
   if (!depsMap) {
     bucket.set(target, (depsMap = new Map()))
@@ -58,7 +58,7 @@ function effect(fn) {
     effectStack.push(effectFn) // 在副作用函数执行前将当前副作用函数压入栈中
     fn()
     effectStack.pop() // 在副作用函数执行后, 将当前副作用函数弹出栈
-    activeEffect = effectStack[effectStack.length - 1] // 还原activeEffect为之前的值
+    activeEffect = effectStack[effectStack.length - 1] // 还原activeEffect为之前的值; 顶层effect执行后, activeEffect为空
   }
   effectFn.deps = []
   effectFn()

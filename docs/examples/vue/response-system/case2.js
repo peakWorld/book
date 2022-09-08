@@ -12,7 +12,7 @@ const obj = new Proxy(data, {
     return target[key]
   },
   set(target, key, newVal) {
-    target[key] = newVal
+    target[key] = newVal // 更新原值, 执行副作用函数响应式数据都获取最新的值
     trigger(target, key) // 将副作用函数从‘桶’中取出并执行
     return true
   }

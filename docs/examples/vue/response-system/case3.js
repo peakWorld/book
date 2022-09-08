@@ -49,7 +49,7 @@ function effect(fn) {
     fn()  // 副作用函数执行完成, 重新建立联系, 不会包含遗留的副作用函数。
   }
   effectFn.deps = [] // 用来存储所有与该副作用函数相关联的依赖集合
-  effectFn()
+  effectFn() // 此处调用, 才会执行真正的副作用函数, 从而执行读取拦截操作
 }
 
 function cleanup (effectFn) {
