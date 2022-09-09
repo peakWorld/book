@@ -5,3 +5,7 @@ export interface Todo {
 }
 
 export const tuple = ['tesla', 'model 3', 'model X', 'model Y'] as const
+
+export type arr1 = ['a', 'b', 'c']
+
+export type tesla = ['tesla', 'model 3', 'model X', 'model Y']
