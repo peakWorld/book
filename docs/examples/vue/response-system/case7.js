@@ -104,7 +104,7 @@ function watch(source, cb, options) {
       lazy: true,
       // scheduler: job // 响应式数据发生改变, 才会触发调度函数
       scheduler() {
-        if (options.flush === 'post') { // 微任务队列执行(dom更新后才执行)
+        if (options.flush === 'post') { // 微任务队列执行
           const p = Promise.resolve()
           p.then(job)
         } else { // 同步执行

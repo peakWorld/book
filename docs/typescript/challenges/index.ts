@@ -26,3 +26,7 @@ type THead = First<arr1>
 // 5. 获取元组长度
 type Length<T extends any[]> = T['length']
 type teslaLen = Length<tesla>
+
+// 6. Exclude
+type MyExclude<T, K> = T extends K ? never : T
+type Result = MyExclude<'a' | 'b' | 'c', 'a'>

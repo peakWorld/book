@@ -1,3 +1,5 @@
+// 竞态-过期函数
+
 const bucket = new WeakMap()
 const effectStack = []
 const data = { foo: 0, bar: 1 }
@@ -91,9 +93,18 @@ function watch(source, cb, options) {
     getter = () => traverse(source)
   }
 
+  let cleanup // 用于存储用户注册的过期函数
+
+  function onInvalidate(fn) {
+    cleanup = fn // 存储用户注册的过期函数
+  }
+
   const job = () => {
     newValue = effectFn()
-    cb(newValue, oldValue)
+    if (cleanup) { // 在调用回调函数前, 先调用过期回调
+      cleanup()
+    }
+    cb(newValue, oldValue, onInvalidate)
     oldValue = newValue
   }
 
@@ -118,17 +129,30 @@ function watch(source, cb, options) {
   }
 }
 
+let finalData = res
 watch(
   obj,
-  () => {
-    console.log('数据发生了改变', obj)
-  },
-  {
-    immediate: true,
-    flush: 'post' // post 微任务队列中执行, sync 同步执行
+  async (newVal, oldValue, onInvalidate) => {
+    // 定义一个标志, 代表当前副作用函数是否过期; 默认false, 代表未过期
+    let expired = false
+    onInvalidate(() => {
+      expired = true
+    })
+    const res = await get()
+    if (!expired) {
+      finalData = res
+    }
   }
 )
 
-obj.foo++
+let i = 0
+function get() {
+  return new Promise((resolve) => setTimeout(() => resolve(i++), 1000))
+}
 
-window.obj = data
+obj.foo++
+setTimeout(() => {
+  obj.foo++
+}, 500)
+
+console.log('finalData', finalData)
