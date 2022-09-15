@@ -95,8 +95,8 @@ function watch(source, cb, options) {
 
   let cleanup // 用于存储用户注册的过期函数
 
-  function onInvalidate(fn) {
-    cleanup = fn // 存储用户注册的过期函数
+  function onInvalidate(fn) { // 注册过期函数
+    cleanup = fn
   }
 
   const job = () => {
