@@ -4,7 +4,7 @@ export interface Todo {
   completed: boolean
 }
 
-export const tuple = ['tesla', 'model 3', 'model X', 'model Y'] as const
+export type tuple = ['tesla', 'model 3', 'model X', 'model Y']
 
 export type arr1 = ['a', 'b', 'c']
 
@@ -20,3 +20,23 @@ export const fn = (v: boolean) => {
   else
     return 2
 }
+
+export type DeepX = { 
+  x: { 
+    a: 1
+    b: 'hi'
+  }
+  y: 'hey',
+  m: () => void,
+  n: [
+    '1',
+    2,
+    () => void,
+    {
+      k: 2,
+      p: string
+    }
+  ]
+}
+
+export type Arr = ['1', '2', '3']
