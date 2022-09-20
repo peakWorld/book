@@ -43,15 +43,6 @@ function cleanup (effectFn) {
   effectFn.deps.length = 0
 }
 
-function traverse(value, seen = new Set()) {
-  if (typeof value !== 'object' || !value || seen.has(value)) return
-  seen.add(value)
-  for (let k in value) {
-    traverse(value[k], seen)
-  }
-  return value
-}
-
 export function effect(fn, options = {}) {
   const effectFn = () => {
     cleanup(effectFn)

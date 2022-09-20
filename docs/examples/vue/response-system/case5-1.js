@@ -1,5 +1,6 @@
-import { setProxy, effect } from './case4-8'
-// 代理函数
+import { setProxy, effect } from './core.js'
+
+// --- 代理函数
 const fn = (name) => {
   console.log('我是', name)
 }
@@ -8,14 +9,14 @@ const pFn = new Proxy(fn, {
     // target   被代理的函数
     // thisArg  函数的this指向
     // argArray 传递给函数的参数
-    console.log(target, thisArg, argArray)
+    // console.log(target, thisArg, argArray)
     target.call(thisArg, ...argArray)
   }
 })
 pFn('hcy')
 pFn.call({ x: 1}, 'hcy2')
 
-// refect
+// --- Reflect基本用法
 const obj = { x: 1 }
 obj.x
 Reflect.get(obj, 'x')
@@ -26,10 +27,11 @@ const obj2 = {
     return this.foo
   }
 }
-console.log(obj2.bar) // 1
-console.log(Reflect.get(obj2, 'foo', { foo: 2 })) // 1
-console.log(Reflect.get(obj2, 'bar', { foo: 2 })) // 2
+// console.log(obj2.bar) // 1
+// console.log(Reflect.get(obj2, 'foo', { foo: 2 })) // 1
+// console.log(Reflect.get(obj2, 'bar', { foo: 2 })) // 2
 
+// --- 为什么用Reflect?
 const proxy = setProxy(obj2)
 effect(() => {
   // 在obj2对象中, bar属性只有getter访问器
@@ -43,9 +45,8 @@ effect(() => {
   proxy.bar
 })
 
-const proxy1 = new Proxy(obj2, {
+new Proxy(obj2, {
   get(target, key, receiver) {
-    // TODO track
     // target 原始对象
     // key 键名
     // receiver proxy1代理对象
@@ -55,3 +56,11 @@ const proxy1 = new Proxy(obj2, {
     return Reflect.get(target, key, receiver)
   }
 })
+
+// --- 拦截Get操作
+const p3 = new Proxy({ x: 1 }, {
+  has(target, key) { // 拦截 ‘key in obj’
+    return Reflect.has(target, key)
+  }
+})
+// console.log('x' in p3)

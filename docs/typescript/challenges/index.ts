@@ -63,7 +63,7 @@ type FunctionParamsType = MyParameters<typeof CONST.foo>
 
 // 14. 获取函数返回类型
 type MyReturnType<T> = T extends (...arg: any) => infer K ? K : never
-type Result7 = MyReturnType<typeof fn> 
+type Result7 = MyReturnType<typeof CONST.fn> 
 
 // 15. 实现 Omit => Omit<T, K> 省略K中字段的T对象
 type MyOmit<T, K> = MyPick<T, MyExclude<keyof T, K>>
@@ -93,3 +93,8 @@ type Result10 = DeepReadonly<CONST.DeepX>
 // 18 元组转合集 返回元组所有值的合集
 type TupleToUnion<T extends any[]> = T[number]
 type Result11 = TupleToUnion<CONST.Arr>
+
+// 19 可串联构造器 
+class Chainable {
+  option: <T>(args: T) => Chainable
+}

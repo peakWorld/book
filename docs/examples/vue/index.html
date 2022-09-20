@@ -7,5 +7,13 @@
   <title>Document</title>
 </head>
 <body></body>
-<script src="./response-system/case5-1.js"></script>
+<!--
+  Chrome使用原生的ES-Module
+
+  添加 type="module" 解决
+  Uncaught SyntaxError: Cannot use import statement outside a module
+
+  http服务启动 python3 -m http.server 8002
+ -->
+<script type="module" src="/response-system/case5-1.js"></script>
 </html>
