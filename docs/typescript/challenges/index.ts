@@ -49,14 +49,6 @@ type Result3 = Concat<[1], [2]>
 type Includes<T extends any[], K> = K extends T[number] ? true : false
 type Result4 = Includes<['Kars', 'Esidisi', 'Wamuu', 'Santana'], 'Wamuu'>
 
-// 11. Push
-type Push<T extends any[], K> = [...T, K] 
-type Result5 = Push<[1, 2], '3'>
-
-// 12. Unshift
-type Unshift<T extends any[], K> = [K, ...T] 
-type Result6 = Unshift<[1, 2], 0>
-
 // 13. Parameters
 type MyParameters<T> = T extends (...arg: infer K) => any ? K : never
 type FunctionParamsType = MyParameters<typeof CONST.foo>
@@ -95,6 +87,30 @@ type TupleToUnion<T extends any[]> = T[number]
 type Result11 = TupleToUnion<CONST.Arr>
 
 // 19 可串联构造器 
-class Chainable {
-  option: <T>(args: T) => Chainable
+type Chainable<T = {}> = {
+  option<K extends string, V>(k: K, v: V): Chainable<
+    {
+      [P in (keyof T | K)]: P extends K ? V : P extends keyof T ? T[P] : never
+    }
+  >
+  get(): T
 }
+declare const Result12: Chainable
+const result = Result12
+  .option('a', 1)
+  .option('b', '1')
+  .option('c', { x: 1 })
+  .get()
+
+// 20 最后一个元素
+type Last<T extends any[]> = T extends [...arg: any[], last: infer T] ? T : never
+type tail1 = Last<['a', 'b', 'c']>
+
+// 21 出栈、
+type Pop<T extends any[]> = T extends [...arg: infer T, last: any] ? T : never
+type Push<T extends any[], K> = [...T, K] 
+type Shift<T extends any[]> = T extends [first: any, ...arg: infer T] ? T : never
+type Unshift<T extends any[], K> = [K, ...T] 
+type re1 = Pop<['a', 'b', 'c', 'd']>
+
+// 22 Promise.all
