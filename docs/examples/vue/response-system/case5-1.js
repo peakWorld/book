@@ -64,3 +64,15 @@ const p3 = new Proxy({ x: 1 }, {
   }
 })
 // console.log('x' in p3)
+
+let ITERATE_KEY = Symbol()
+const p4 = new Proxy({ x: 1, y: 2 }, {
+  ownKeys(target) { // 拦截for...in
+    console.log('target', target)
+    // track(target, ITERATE_KEY)
+    return Reflect.ownKeys(target)
+  }
+})
+
+for (let k in p4) {}
+// Reflect.ownKeys(p4)
