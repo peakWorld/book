@@ -40,3 +40,9 @@ export type DeepX = {
 }
 
 export type Arr = ['1', '2', '3']
+
+export const promise1 = Promise.resolve(3);
+export const promise2 = 42;
+export const promise3 = new Promise<string>((resolve, reject) => {
+  setTimeout(resolve, 100, 'foo');
+});

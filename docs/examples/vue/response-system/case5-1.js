@@ -1,4 +1,4 @@
-import { setProxy, effect } from './core.js'
+import { setProxy, effect } from './core4.js'
 
 // --- 代理函数
 const fn = (name) => {

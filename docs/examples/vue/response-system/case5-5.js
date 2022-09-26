@@ -3,41 +3,42 @@ const effectStack = []
 let activeEffect 
 let ITERATE_KEY = Symbol()
 
-const obj = { x: 1, y: 1, z: NaN }
-
-const proxy = new Proxy(obj, {
-  get(target, key, receiver) {
-    track(target, key)
-    return Reflect.get(target, key, receiver)
-  },
-  has(target, key) {
-    track(target, key)
-    return Reflect.has(target, key)
-  },
-  ownKeys(target) {
-    track(target, ITERATE_KEY)
-    return Reflect.ownKeys(target)
-  },
-  set(target, key, newVal, receiver) {
-    const oldVal = target[key]
-    const type = Object.prototype.hasOwnProperty(target, key) ? 'SET' : 'ADD'
-    const res = Reflect.set(target, key, newVal, receiver)
-    if (
-      (oldVal !== newVal) // 解决问题Q1 => 只有值发生变化才触发trigger
-      && (oldVal === oldVal || newVal === newVal) // 解决问题Q2 => 新值和旧值都是NaN, 不触发tigger
-    ) {
-      trigger(target, key, type)
+function reactive(obj) {
+  const proxy = new Proxy(obj, {
+    get(target, key, receiver) {
+      track(target, key)
+      return Reflect.get(target, key, receiver)
+    },
+    has(target, key) {
+      track(target, key)
+      return Reflect.has(target, key)
+    },
+    ownKeys(target) {
+      track(target, ITERATE_KEY)
+      return Reflect.ownKeys(target)
+    },
+    set(target, key, newVal, receiver) {
+      const oldVal = target[key]
+      const type = Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
+      const res = Reflect.set(target, key, newVal, receiver)
+      if (
+        (oldVal !== newVal)
+        && (oldVal === oldVal || newVal === newVal)
+      ) {
+        trigger(target, key, type)
+      }
+      return res
+    },
+    defineProperty(target, key) {
+      const hadKey = Object.prototype.hasOwnProperty(target, key)
+      const res = Reflect.deleteProperty(target, key)
+      if (hadKey && res) {
+        trigger(target, key, 'DELETE')
+      }
     }
-    return res
-  },
-  defineProperty(target, key) {
-    const hadKey = Object.prototype.hasOwnProperty(target, key)
-    const res = Reflect.deleteProperty(target, key)
-    if (hadKey && res) {
-      trigger(target, key, 'DELETE')
-    }
-  }
-})
+  })
+  return proxy
+}
 
 function track (target, key) {
   if (!activeEffect) return
@@ -109,9 +110,17 @@ export function effect(fn, options = {}) {
   return effectFn
 }
 
-// Q1 x值未发生变化, 不应该触发trigger;
-// obj.x = 1
+const obj = {}
+const proto = { bar: 1 }
+const child = reactive(obj)
+const parent = reactive(proto)
 
-// Q2 z重新赋值为NaN, 不应该触发trigger; 
-// obj.z = NaN
-// 因为!!(NaN !== NaN)为true, 知NaN是互不相等;
+Object.setPrototypeOf(child, parent)
+
+effect(() => {
+  console.log(child.bar)
+})
+
+child.bar = 2
+
+window.bucket = bucket

@@ -95,6 +95,7 @@ type Chainable<T = {}> = {
   >
   get(): T
 }
+// 要想使用, 必须先声明(初始化)
 declare const Result12: Chainable
 const result = Result12
   .option('a', 1)
@@ -114,3 +115,17 @@ type Unshift<T extends any[], K> = [K, ...T]
 type re1 = Pop<['a', 'b', 'c', 'd']>
 
 // 22 Promise.all
+declare function MyPromiseAll <T extends unknown[]>(arg: readonly [...T]): {
+  [P in keyof T]: T[P] extends Promise<any> ? MyAwaited<T[P]> : T[P] 
+}
+// 调用函数, 必须先声明函数
+const p = MyPromiseAll([CONST.promise1, CONST.promise2, CONST.promise3] as const)
+
+// 为什么返回值定义时为{},最终得到[]?
+type A1 = { x: 1, y: 2 }
+type A2 = [1, 3, 5]
+type AA<T> = { [P in keyof T]: T[P] }
+type A11 = AA<A1>
+type A21 = AA<A2>
+
+// 23 
