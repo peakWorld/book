@@ -3,14 +3,47 @@ const effectStack = []
 let activeEffect 
 let ITERATE_KEY = Symbol()
 
-function reactive(obj) {
+function reactive(obj) { // 深响应
+  return createReactive(obj)
+}
+
+function shallowReactive(obj) { // 浅响应
+  return createReactive(obj, true)
+}
+
+function readonly (obj) { // 深只读
+  return createReactive(obj, false, true)
+}
+
+function shallowReadonly (obj) { // 浅只读
+  return createReactive(obj, true, true)
+}
+
+// 原始数据 浅响应 是否只读
+function createReactive(obj, isShallow = false, isReadonly = false) {
   const proxy = new Proxy(obj, {
     get(target, key, receiver) {
-      if (key === 'raw') { // 代理对象通过raw属性访问原始数据
+      if (key === 'raw') {
         return target
       }
-      track(target, key)
-      return Reflect.get(target, key, receiver)
+
+      if (!isReadonly) { // 非只读时才需要建立联系
+        track(target, key)
+      }
+
+      const res = Reflect.get(target, key, receiver) // 得到原始值结果
+
+      if (isShallow) { // 浅响应
+        return res
+      }
+
+      if (typeof res === 'object' && res !== null) { // 深响应
+        // 将原始值封装成响应式数据返回
+        // 只读时, 用readonly包装返回只读代理对象
+        return isReadonly ? readonly(res) : reactive(res) 
+      }
+
+      return res
     },
     has(target, key) {
       track(target, key)
@@ -21,12 +54,14 @@ function reactive(obj) {
       return Reflect.ownKeys(target)
     },
     set(target, key, newVal, receiver) {
+      if (isReadonly) {
+        console.warn(`属性${key}只读。`)
+        return
+      }
+
       const oldVal = target[key]
       const type = Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
       const res = Reflect.set(target, key, newVal, receiver)
-
-      // 通过原型链的方式set数据, receiver都是child代理对象, 而target是各自的原始对象
-      // 通过判断target, 剔除原型链上的重复处理
       if (target === receiver.raw) {
         if ((oldVal !== newVal) && (oldVal === oldVal || newVal === newVal)) {
           trigger(target, key, type)
@@ -35,6 +70,11 @@ function reactive(obj) {
       return res
     },
     deleteProperty(target, key) {
+      if (isReadonly) {
+        console.warn(`属性${key}只读。`)
+        return
+      }
+
       const hadKey = Object.prototype.hasOwnProperty(target, key)
       const res = Reflect.deleteProperty(target, key)
       if (hadKey && res) {
@@ -97,7 +137,7 @@ function cleanup (effectFn) {
   effectFn.deps.length = 0
 }
 
-export function effect(fn, options = {}) {
+function effect(fn, options = {}) {
   const effectFn = () => {
     cleanup(effectFn)
     activeEffect = effectFn 
@@ -115,17 +155,21 @@ export function effect(fn, options = {}) {
   return effectFn
 }
 
-const obj = {}
-const proto = { bar: 1 }
-const child = reactive(obj)
-const parent = reactive(proto)
-
-Object.setPrototypeOf(child, parent)
-
+const obj = reactive({ foo: { bar: 1 } }) // 深响应数据
 effect(() => {
-  console.log(child.bar)
+  console.log('obj => ', obj.foo.bar)
+  // foo = obj.foo  foo是代理对象
+  // foo.bar
 })
+obj.foo.bar = 2 // 重新执行
 
-child.bar = 2
+const obj2 = shallowReactive({ foo: { bar: 1 } }) // 浅响应数据
+effect(() => {
+  console.log('obj2 => ', obj2.foo.bar)
+  // foo = obj2.foo  foo是原始数据
+  // foo.bar
+})
+obj2.foo.bar = 2 // 不重新执行
+
 
 window.bucket = bucket

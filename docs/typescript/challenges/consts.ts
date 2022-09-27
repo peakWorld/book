@@ -46,3 +46,14 @@ export const promise2 = 42;
 export const promise3 = new Promise<string>((resolve, reject) => {
   setTimeout(resolve, 100, 'foo');
 });
+
+export interface Cat {
+  type: 'cat'
+  breeds: 'Abyssinian' | 'Shorthair' | 'Curl' | 'Bengal'
+}
+
+export interface Dog {
+  type: 'dog'
+  breeds: 'Hound' | 'Brittany' | 'Bulldog' | 'Boxer'
+  color: 'brown' | 'white' | 'black'
+}

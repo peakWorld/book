@@ -30,7 +30,7 @@ const proxy = new Proxy(obj, {
     }
     return res
   },
-  defineProperty(target, key) {
+  deleteProperty(target, key) {
     const hadKey = Object.prototype.hasOwnProperty(target, key)
     const res = Reflect.deleteProperty(target, key)
     if (hadKey && res) {

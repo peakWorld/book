@@ -128,4 +128,6 @@ type AA<T> = { [P in keyof T]: T[P] }
 type A11 = AA<A1>
 type A21 = AA<A2>
 
-// 23 
+// 23 Lookup 在联合类型中搜索公共字段来获取相应的类型。
+type Lookup<T, K extends string> = T extends { type: K } ? T : never
+type Result13 = Lookup<CONST.Cat | CONST.Dog, 'dog'>

@@ -27,7 +27,7 @@ const proxy = new Proxy(obj, {
     trigger(target, key, type)
     return res
   },
-  defineProperty(target, key) {
+  deleteProperty(target, key) {
     const hadKey = Object.prototype.hasOwnProperty(target, key)
     const res = Reflect.deleteProperty(target, key)
     // 只有被删除对象是自身属性切删除成功时, 才触发更新
