@@ -131,3 +131,10 @@ type A21 = AA<A2>
 // 23 Lookup 在联合类型中搜索公共字段来获取相应的类型。
 type Lookup<T, K extends string> = T extends { type: K } ? T : never
 type Result13 = Lookup<CONST.Cat | CONST.Dog, 'dog'>
+
+// 24 Trim Left 删除原字符串开头的空白字符串
+// extends 在泛型中, 约束范围; extends 在判断语句中, 用infer推断类型
+type TrimLeft<T extends string> = T extends `${' ' | "\n" | "\t"}${infer S}` ? TrimLeft<S> : T
+type Readonly14 = TrimLeft<'  Hello World  '>
+
+// 25 Trim 删除原字符串两端的空白符
