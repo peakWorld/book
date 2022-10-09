@@ -74,7 +74,6 @@ function trigger (target, key, type) {
       }
     })
   }
-  
 
   effectsToRun.forEach(effectFn => {
     if (effectFn.options.scheduler) {

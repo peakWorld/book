@@ -133,8 +133,10 @@ type Lookup<T, K extends string> = T extends { type: K } ? T : never
 type Result13 = Lookup<CONST.Cat | CONST.Dog, 'dog'>
 
 // 24 Trim Left 删除原字符串开头的空白字符串
-// extends 在泛型中, 约束范围; extends 在判断语句中, 用infer推断类型
+// extends 在泛型中, 约束范围; extends 在判断语句中, 用infer推断类型 => [A extends B, 则B的属性A都可访问, 可认为A拥有B的所有属性]
 type TrimLeft<T extends string> = T extends `${' ' | "\n" | "\t"}${infer S}` ? TrimLeft<S> : T
 type Readonly14 = TrimLeft<'  Hello World  '>
 
 // 25 Trim 删除原字符串两端的空白符
+type Trim<T extends string> = T extends `${' ' | "\n" | "\t"}${infer SL}` ? Trim<SL> : T extends `${infer SR}${' ' | "\n" | "\t"}` ? Trim<SR> : T
+type Readonly15 = Trim<'  Hello World  '>

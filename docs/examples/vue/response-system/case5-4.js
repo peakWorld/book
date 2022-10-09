@@ -21,7 +21,7 @@ const p12 = new Proxy(obj, {
   }
 })
 const p22 = new Proxy(proto, {})
-// 对代理对象p1设置原型对象操作, 这个操作会调用代理对象的内部方法[[SetPrototypeOf]]
+// 对代理对象p12设置原型对象操作, 这个操作会调用代理对象的内部方法[[SetPrototypeOf]]
 // 而内部方法[[SetPrototypeOf]]被setPrototypeOf拦截函数所拦截, 进而做自定义操作
 
 Object.setPrototypeOf(p12, p22)
