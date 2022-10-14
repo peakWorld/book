@@ -85,8 +85,8 @@ function cleanup (effectFn) {
 // obj.foo = false
 
 // 无限递归循环
-// effect(() => {
-//   obj.foo++
-// })
+effect(() => {
+  obj.foo++
+})
 
 window.obj = data

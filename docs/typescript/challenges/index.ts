@@ -104,13 +104,13 @@ const result = Result12
   .get()
 
 // 20 最后一个元素
-type Last<T extends any[]> = T extends [...arg: any[], last: infer T] ? T : never
+type Last<T extends any[]> = T extends [...any[], infer T] ? T : never
 type tail1 = Last<['a', 'b', 'c']>
 
 // 21 出栈、
-type Pop<T extends any[]> = T extends [...arg: infer T, last: any] ? T : never
+type Pop<T extends any[]> = T extends [...infer T, any] ? T : never
 type Push<T extends any[], K> = [...T, K] 
-type Shift<T extends any[]> = T extends [first: any, ...arg: infer T] ? T : never
+type Shift<T extends any[]> = T extends [any, ...infer T] ? T : never
 type Unshift<T extends any[], K> = [K, ...T] 
 type re1 = Pop<['a', 'b', 'c', 'd']>
 
@@ -140,3 +140,7 @@ type Readonly14 = TrimLeft<'  Hello World  '>
 // 25 Trim 删除原字符串两端的空白符
 type Trim<T extends string> = T extends `${' ' | "\n" | "\t"}${infer SL}` ? Trim<SL> : T extends `${infer SR}${' ' | "\n" | "\t"}` ? Trim<SR> : T
 type Readonly15 = Trim<'  Hello World  '>
+
+// 26 Capitalize 字符串的第一个字母转换为大写，其余字母保持原样
+type Capitalize<T extends string> = T extends `${infer F}${infer R}` ? `${Uppercase<F>}${R}` : T
+type capitalized = Capitalize<'hello world'>

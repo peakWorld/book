@@ -17,10 +17,12 @@ function effect () { // 副作用函数
   document.body.innerText = obj.text
 }
 effect() // 执行函数, 触发读取操作
-setTimeout(() => {
-  obj.text = 'Hello Vue3' // 修改属性值, 触发设置操作
-}, 1000)
+// setTimeout(() => {
+//   obj.text = 'Hello Vue3' // 修改属性值, 触发设置操作
+// }, 1000)
 
+obj.text = 'Hello Vue3'
+obj.msg = 'go'
 // 为什么依赖用set收集？
 // 设置操作中执行forEach, 执行副作用函数, 副作用函数中有读取操作, 会导致重复收集副作用函数。
 // set收集保证副作用函数唯一

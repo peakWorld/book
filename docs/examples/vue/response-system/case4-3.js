@@ -36,7 +36,10 @@ function trigger (target, key) {
   if (!depsMap) return
   const effects = depsMap.get(key)
 
-  // effects && effects.forEach(fn => fn()) // 导致无限循环
+  // effects && effects.forEach(fn => {
+  //   console.log('....')
+  //   fn()
+  // }) // 导致无限循环
 
   const effectsToRun = new Set(effects) // 避免无限循环
   effectsToRun.forEach(effectFn => effectFn())
@@ -61,17 +64,20 @@ function cleanup (effectFn) {
 }
 
 effect(() => {
-  document.body.innerText = obj.ok ? obj.text : 'not'
+  // document.body.innerText = obj.ok ? obj.text : 'not'
+  obj.ok
 })
 
-setTimeout(() => {
-  obj.text = 'Hello Vue3'
-}, 1000)
+// setTimeout(() => {
+//   obj.text = 'Hello Vue3'
+// }, 1000)
 
-setTimeout(() => {
-  obj.msg = 'Hello Vue3...'
-}, 1000)
+// setTimeout(() => {
+//   obj.msg = 'Hello Vue3...'
+// }, 1000)
 
+window.bucket = bucket;
+window.obj = obj;
 
 // trigger函数中的 effects && effects.forEach(fn => fn()) 为什么导致无限循环？
 // 执行副作用函数
