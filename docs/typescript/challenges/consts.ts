@@ -57,3 +57,5 @@ export interface Dog {
   breeds: 'Hound' | 'Brittany' | 'Bulldog' | 'Boxer'
   color: 'brown' | 'white' | 'black'
 }
+
+export type Fn = (a: number, b: string) => number

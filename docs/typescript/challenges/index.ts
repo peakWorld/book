@@ -122,18 +122,19 @@ declare function MyPromiseAll <T extends unknown[]>(arg: readonly [...T]): {
 const p = MyPromiseAll([CONST.promise1, CONST.promise2, CONST.promise3] as const)
 
 // 为什么返回值定义时为{},最终得到[]?
-type A1 = { x: 1, y: 2 }
-type A2 = [1, 3, 5]
+type B1 = { x: 1, y: 2 }
+type B2 = [1, 3, 5]
 type AA<T> = { [P in keyof T]: T[P] }
-type A11 = AA<A1>
-type A21 = AA<A2>
+type A11 = AA<B1>
+type A21 = AA<B2>
 
 // 23 Lookup 在联合类型中搜索公共字段来获取相应的类型。
 type Lookup<T, K extends string> = T extends { type: K } ? T : never
 type Result13 = Lookup<CONST.Cat | CONST.Dog, 'dog'>
 
 // 24 Trim Left 删除原字符串开头的空白字符串
-// extends 在泛型中, 约束范围; extends 在判断语句中, 用infer推断类型 => [A extends B, 则B的属性A都可访问, 可认为A拥有B的所有属性]
+// extends 在泛型中, 约束范围; 
+// extends 在判断(假设)语句中, 用infer推断类型 => [A extends B,则B的属性A都可访问,可认为A拥有B的所有属性(如果符合某个类型,则推断出某些类型)]
 type TrimLeft<T extends string> = T extends `${' ' | "\n" | "\t"}${infer S}` ? TrimLeft<S> : T
 type Readonly14 = TrimLeft<'  Hello World  '>
 
@@ -144,3 +145,28 @@ type Readonly15 = Trim<'  Hello World  '>
 // 26 Capitalize 字符串的第一个字母转换为大写，其余字母保持原样
 type Capitalize<T extends string> = T extends `${infer F}${infer R}` ? `${Uppercase<F>}${R}` : T
 type capitalized = Capitalize<'hello world'>
+
+// 27 Replace<S, From, To> 将字符串 S 中的第一个子字符串 From 替换为 To
+type Replace<S extends string, From extends string, To extends string> = S extends `${infer L}${From}${infer R}` ? `${L}${To}${R}` : S
+type Readonly16 = Replace<'types are fun!', 'fun', 'awesome'>
+
+// 28 ReplaceAll<S, From, To> 将一个字符串 S 中的所有子字符串 From 替换为 To
+type ReplaceAll<S extends string, From extends string, To extends string> = S extends `${infer L}${From}${infer R}` ? ReplaceAll<`${L}${To}${R}`, From, To> : S
+type replaced = ReplaceAll<'t y p e s', ' ', ''>
+
+// 29 AppendArgument<Fn, A> 给定的函数类型 Fn，以及一个任意类型 A，返回一个新的函数 G。G 拥有 Fn 的所有参数并在末尾追加类型为 A 的参数
+type AppendArgument<F extends any, T extends any> = F extends (...args: infer K) => any ? [...K, T] : never
+type Result18 = AppendArgument<CONST.Fn, boolean>
+
+// 30 实现联合类型的全排列，将联合类型转换成所有可能的全排列数组的联合类型。
+type Permutation<T, U = T> = [T] extends [never] ? [] : U extends T ? [U, ...Permutation<Exclude<T, U>>] : []
+type perm = Permutation<'A' | 'B' | 'C'>
+
+type A1 = 'A' | 'B' | 'C' 
+type A2<T> = T extends any ? [T] : never     // 抽取联合类型; 联合类型, 返回类型的最小公共集合
+type A3<T> = [T] extends [any] ? [T] : never // 暂存输入的T
+type A4 = A2<A1> 
+type A5 = A3<A1>
+
+// 31 
+

@@ -58,7 +58,6 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
         console.warn(`属性${key}只读。`)
         return
       }
-
       const oldVal = target[key]
       const type = Array.isArray(target) 
         // 代理目标是数组, 则检测被设置的索引值是否小于数组长度; 是则为'SET', 否则为'ADD'
@@ -67,7 +66,7 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
       const res = Reflect.set(target, key, newVal, receiver)
       if (target === receiver.raw) {
         if ((oldVal !== newVal) && (oldVal === oldVal || newVal === newVal)) {
-          trigger(target, key, type)
+          trigger(target, key, type, newVal)
         }
       }
       return res
@@ -105,20 +104,42 @@ function track (target, key) {
 function trigger (target, key, type) {
   const depsMap = bucket.get(target)
   if (!depsMap) return
-  const effects = depsMap.get(key)
+  const effects = depsMap.get(key) // 当前属性关联的副作用函数
 
-  const effectsToRun = new Set()
+  const effectsToRun = new Set() // 待执行的副作用函数集合[属性关联、迭代相关、数组相关]
   effects && effects.forEach(effectFn => {
     if (effectFn !== activeEffect) {
       effectsToRun.add(effectFn)
     }
   })
  
-  if (['ADD', 'DELETE'].includes(type)) {
+  if (['ADD', 'DELETE'].includes(type)) { // 与当前对象迭代操作相关的副作用函数
     const iterateEffects = depsMap.get(ITERATE_KEY)
     iterateEffects && iterateEffects.forEach(effectFn => {
       if (effectFn !== activeEffect) {
         effectsToRun.add(effectFn)
+      }
+    })
+  }
+
+  if (type === 'ADD' && Array.isArray(target)) { // 数组, 且类型为ADD; 执行length相关的副作用函数
+    const lengthEffects = depsMap.get('length')
+    lengthEffects && lengthEffects.forEach(effectFn => {
+      if (effectFn !== activeEffect) {
+        effectsToRun.add(effectFn)
+      }
+    })
+  }
+
+  if (Array.isArray(target) && key === 'length') { // 数组, 且修改了length
+    // 把所有相关联的副作用函数取出并添加到待执行集合中
+    depsMap.forEach((effects, key) => {
+      if (key >= newVal) { // 索引大于或等于新length值的元素
+        effects.forEach(effectFn => {
+          if (effectFn !== activeEffect) {
+            effectsToRun.add(effectFn)
+          }
+        })
       }
     })
   }
@@ -158,11 +179,7 @@ function effect(fn, options = {}) {
   return effectFn
 }
 
-const obj = shallowReactive([1, 3, 5]) // 浅响应数据
-effect(() => {
-  console.log('obj => ', obj[0])
-})
-obj[0] = 3
-
+const arr = shallowReactive([1, 2, 3])
+arr.length = 1
 
 window.bucket = bucket
