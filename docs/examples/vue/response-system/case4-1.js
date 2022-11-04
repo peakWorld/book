@@ -13,7 +13,7 @@ const obj = new Proxy(data, {
   }
 })
 
-function effect () { // 副作用函数
+function effect() { // 副作用函数
   document.body.innerText = obj.text
 }
 effect() // 执行函数, 触发读取操作

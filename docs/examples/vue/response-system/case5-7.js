@@ -1,6 +1,6 @@
 const bucket = new WeakMap()
 const effectStack = []
-let activeEffect 
+let activeEffect
 let ITERATE_KEY = Symbol()
 
 function reactive(obj) { // 深响应
@@ -11,15 +11,14 @@ function shallowReactive(obj) { // 浅响应
   return createReactive(obj, true)
 }
 
-function readonly (obj) { // 深只读
+function readonly(obj) { // 深只读
   return createReactive(obj, false, true)
 }
 
-function shallowReadonly (obj) { // 浅只读
+function shallowReadonly(obj) { // 浅只读
   return createReactive(obj, true, true)
 }
 
-// 原始数据 浅响应 是否只读
 function createReactive(obj, isShallow = false, isReadonly = false) {
   const proxy = new Proxy(obj, {
     get(target, key, receiver) {
@@ -27,20 +26,18 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
         return target
       }
 
-      if (!isReadonly) { // 非只读时才需要建立联系
+      if (!isReadonly) {
         track(target, key)
       }
 
-      const res = Reflect.get(target, key, receiver) // 得到原始值结果
+      const res = Reflect.get(target, key, receiver)
 
-      if (isShallow) { // 浅响应
+      if (isShallow) {
         return res
       }
 
-      if (typeof res === 'object' && res !== null) { // 深响应
-        // 将原始值封装成响应式数据返回
-        // 只读时, 用readonly包装返回只读代理对象
-        return isReadonly ? readonly(res) : reactive(res) 
+      if (typeof res === 'object' && res !== null) {
+        return isReadonly ? readonly(res) : reactive(res)
       }
 
       return res
@@ -50,7 +47,8 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
       return Reflect.has(target, key)
     },
     ownKeys(target) {
-      track(target, ITERATE_KEY)
+      // 如果操作目标target是数组, 则使用length属性作为key并建立响应联系
+      track(target, Array.isArray(target) ? 'length' : ITERATE_KEY)
       return Reflect.ownKeys(target)
     },
     set(target, key, newVal, receiver) {
@@ -59,8 +57,10 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
         return
       }
       const oldVal = target[key]
-      const type = Array.isArray(target) 
-        // 代理目标是数组, 则检测被设置的索引值是否小于数组长度; 是则为'SET', 否则为'ADD'
+      const type = Array.isArray(target)
+        // 代理目标是数组
+        // key 为索引值, 索引值小于数组长度则为'SET', 否则为 'ADD'
+        // key 为length, Number(key)为NaN, 肯定为false, 即为'ADD'
         ? Number(key) < target.length ? 'SET' : 'ADD'
         : Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
       const res = Reflect.set(target, key, newVal, receiver)
@@ -87,7 +87,7 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
   return proxy
 }
 
-function track (target, key) {
+function track(target, key) {
   if (!activeEffect) return
   let depsMap = bucket.get(target)
   if (!depsMap) {
@@ -101,7 +101,7 @@ function track (target, key) {
   activeEffect.deps.push(deps)
 }
 
-function trigger (target, key, type) {
+function trigger(target, key, type, newVal) {
   const depsMap = bucket.get(target)
   if (!depsMap) return
   const effects = depsMap.get(key) // 当前属性关联的副作用函数
@@ -112,7 +112,7 @@ function trigger (target, key, type) {
       effectsToRun.add(effectFn)
     }
   })
- 
+
   if (['ADD', 'DELETE'].includes(type)) { // 与当前对象迭代操作相关的副作用函数
     const iterateEffects = depsMap.get(ITERATE_KEY)
     iterateEffects && iterateEffects.forEach(effectFn => {
@@ -122,7 +122,7 @@ function trigger (target, key, type) {
     })
   }
 
-  if (type === 'ADD' && Array.isArray(target)) { // 数组, 且类型为ADD; 执行length相关的副作用函数
+  if (Array.isArray(target) && type === 'ADD') { // 数组, 且类型为ADD; 执行length相关的副作用函数
     const lengthEffects = depsMap.get('length')
     lengthEffects && lengthEffects.forEach(effectFn => {
       if (effectFn !== activeEffect) {
@@ -143,7 +143,7 @@ function trigger (target, key, type) {
       }
     })
   }
-  
+
   effectsToRun.forEach(effectFn => {
     if (effectFn.options.scheduler) {
       effectFn.options.scheduler(effectFn)
@@ -153,7 +153,7 @@ function trigger (target, key, type) {
   })
 }
 
-function cleanup (effectFn) {
+function cleanup(effectFn) {
   for (let i = 0, len = effectFn.deps.length; i < len; i++) {
     const deps = effectFn.deps[i]
     deps.delete(effectFn)
@@ -164,7 +164,7 @@ function cleanup (effectFn) {
 function effect(fn, options = {}) {
   const effectFn = () => {
     cleanup(effectFn)
-    activeEffect = effectFn 
+    activeEffect = effectFn
     effectStack.push(effectFn)
     const res = fn()
     effectStack.pop()
@@ -179,7 +179,12 @@ function effect(fn, options = {}) {
   return effectFn
 }
 
-const arr = shallowReactive([1, 2, 3])
-arr.length = 1
+const arr = reactive(['foo'])
 
-window.bucket = bucket
+effect(() => {
+  for (const key in arr) {
+    console.log(key)
+  }
+})
+// arr[1] = 'bar'
+arr.length = 0

@@ -7,18 +7,18 @@ const gg: GG.Person = { name: 'aa', age: 12 }
 
 let a = { x: 1, y: 2 }
 
-type  xx = keyof typeof a
+type xx = keyof typeof a
 
 type xx2 = Pick<T, K>
 
 class A {
-  say(){}
+  say() { }
 }
 class B {
-  say(){}
+  say() { }
 }
 
-class C extends A, B {}
+class C extends A, B { }
 
 type ZZZ = 'x'
 type ZZy = 'x' | 'y'
@@ -39,6 +39,6 @@ type RT = ReturnType<typeof AAA2>
 
 type DeepReadOnly<T> = {
   readonly [K in keyof T]: T[K] extends string | number ? T[K] : DeepReadOnly<T[K]>
-} 
+}
 
-type xxx3 = DeepReadOnly<{ x: 1, y : '2', z: { a: 1, b: '2' }}>
+type xxx3 = DeepReadOnly<{ x: 1, y: '2', z: { a: 1, b: '2' } }>

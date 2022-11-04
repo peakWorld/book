@@ -18,7 +18,7 @@ const obj = new Proxy(data, {
   }
 })
 
-function track (target, key) {
+function track(target, key) {
   if (!activeEffect) return // activeEffect为空, 直接return
   let depsMap = bucket.get(target) // 根据target从‘桶’中获取desMap(map类型: key --> effects)
   if (!depsMap) {
@@ -31,7 +31,7 @@ function track (target, key) {
   deps.add(activeEffect) // 将副作用函数添加到‘桶’中
 }
 
-function trigger (target, key) {
+function trigger(target, key) {
   const depsMap = bucket.get(target) // 根据target从‘桶’中取得depsMap
   if (!depsMap) return
   const effects = depsMap.get(key) // 根据key取得所有副作用函数 effects
