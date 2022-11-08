@@ -26,7 +26,6 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
         return target
       }
 
-      // 如果key的类型是symbol, 则不进行追踪
       if (!isReadonly && typeof key !== 'symbol') {
         track(target, key)
       }
@@ -37,6 +36,7 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
         return res
       }
 
+      // Q1问题
       if (typeof res === 'object' && res !== null) {
         return isReadonly ? readonly(res) : reactive(res)
       }
@@ -48,7 +48,6 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
       return Reflect.has(target, key)
     },
     ownKeys(target) {
-      // 如果操作目标target是数组, 则使用length属性作为key并建立响应联系
       track(target, Array.isArray(target) ? 'length' : ITERATE_KEY)
       return Reflect.ownKeys(target)
     },
@@ -59,9 +58,6 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
       }
       const oldVal = target[key]
       const type = Array.isArray(target)
-        // 代理目标是数组
-        // key 为索引值, 索引值小于数组长度则为'SET', 否则为 'ADD'
-        // key 为length, Number(key)为NaN, 肯定为false, 即为'ADD'
         ? Number(key) < target.length ? 'SET' : 'ADD'
         : Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
       const res = Reflect.set(target, key, newVal, receiver)
@@ -105,16 +101,16 @@ function track(target, key) {
 function trigger(target, key, type, newVal) {
   const depsMap = bucket.get(target)
   if (!depsMap) return
-  const effects = depsMap.get(key) // 当前属性关联的副作用函数
+  const effects = depsMap.get(key)
 
-  const effectsToRun = new Set() // 待执行的副作用函数集合[属性关联、迭代相关、数组相关]
+  const effectsToRun = new Set()
   effects && effects.forEach(effectFn => {
     if (effectFn !== activeEffect) {
       effectsToRun.add(effectFn)
     }
   })
 
-  if (['ADD', 'DELETE'].includes(type)) { // 与当前对象迭代操作相关的副作用函数
+  if (['ADD', 'DELETE'].includes(type)) {
     const iterateEffects = depsMap.get(ITERATE_KEY)
     iterateEffects && iterateEffects.forEach(effectFn => {
       if (effectFn !== activeEffect) {
@@ -123,7 +119,7 @@ function trigger(target, key, type, newVal) {
     })
   }
 
-  if (Array.isArray(target) && type === 'ADD') { // 数组, 且类型为ADD; 执行length相关的副作用函数
+  if (Array.isArray(target) && type === 'ADD') {
     const lengthEffects = depsMap.get('length')
     lengthEffects && lengthEffects.forEach(effectFn => {
       if (effectFn !== activeEffect) {
@@ -132,10 +128,9 @@ function trigger(target, key, type, newVal) {
     })
   }
 
-  if (Array.isArray(target) && key === 'length') { // 数组, 且修改了length
-    // 把所有相关联的副作用函数取出并添加到待执行集合中
+  if (Array.isArray(target) && key === 'length') {
     depsMap.forEach((effects, key) => {
-      if (key >= newVal) { // 索引大于或等于新length值的元素
+      if (key >= newVal) {
         effects.forEach(effectFn => {
           if (effectFn !== activeEffect) {
             effectsToRun.add(effectFn)
@@ -180,12 +175,9 @@ function effect(fn, options = {}) {
   return effectFn
 }
 
-const arr = reactive(['foo', 'bar'])
-
-effect(() => {
-  for (const key of arr) {
-    console.log(key)
-  }
-})
-arr[1] = 'bar2'
-// arr.length = 0
+const obj = {}
+const arr = reactive([obj])
+console.log(arr.includes(arr[0])) // false Q1为什么？
+// 通过代理对象来访问元素值时,如果值仍然是可以被代理的, 那么得到的值就是新的代理对象而非原始对象。
+  // arr[0] 得到一个代理对象
+  // includes内部也会通过arr访问数组元素,也会得到一个代理对象
