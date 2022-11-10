@@ -1,50 +1,61 @@
 const bucket = new WeakMap();
 const effectStack = [];
+const reactiveMap = new Map();
+const arrayInstrumentations = {};
+
 let activeEffect;
 let ITERATE_KEY = Symbol();
+let shouldTrack = false;
+
+['includes', 'indexOf', 'lastIndexOf'].forEach((method) => {
+  const originMethod = Array.prototype[method];
+  arrayInstrumentations[method] = function (...args) {
+    let res = originMethod.apply(this, args);
+    if (res === false || res === -1) {
+      res = originMethod.apply(this.raw, args);
+    }
+    return res;
+  };
+});
+
+['push', 'pop', 'shift', 'unshift', 'splice'].forEach((method) => {
+  const originMethod = Array.prototype[method];
+  arrayInstrumentations[method] = function (...args) {
+    shouldTrack = false; // 在调用原始方法前, 禁止追踪
+    let res = originMethod.apply(this, args);
+    shouldTrack = true; // 在调用原始方法后, 允许追踪
+    return res;
+  };
+});
 
 function reactive(obj) {
-  // 深响应
-  return createReactive(obj);
-}
-
-function shallowReactive(obj) {
-  // 浅响应
-  return createReactive(obj, true);
-}
-
-function readonly(obj) {
-  // 深只读
-  return createReactive(obj, false, true);
-}
-
-function shallowReadonly(obj) {
-  // 浅只读
-  return createReactive(obj, true, true);
+  const exisitProxy = reactiveMap.get(obj);
+  if (exisitProxy) return exisitProxy;
+  const proxy = createReactive(obj);
+  reactiveMap.set(obj, proxy);
+  return proxy;
 }
 
 function createReactive(obj, isShallow = false, isReadonly = false) {
   const proxy = new Proxy(obj, {
     get(target, key, receiver) {
+      console.log('get', key);
       if (key === 'raw') {
         return target;
       }
-
-      // 如果key的类型是symbol, 则不进行追踪
+      if (Array.isArray(target) && arrayInstrumentations.hasOwnProperty(key)) {
+        return Reflect.get(arrayInstrumentations, key, receiver);
+      }
       if (!isReadonly && typeof key !== 'symbol') {
         track(target, key);
       }
-
       const res = Reflect.get(target, key, receiver);
-
       if (isShallow) {
         return res;
       }
-
       if (typeof res === 'object' && res !== null) {
         return isReadonly ? readonly(res) : reactive(res);
       }
-
       return res;
     },
     has(target, key) {
@@ -52,21 +63,18 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
       return Reflect.has(target, key);
     },
     ownKeys(target) {
-      // 如果操作目标target是数组, 则使用length属性作为key并建立响应联系
       track(target, Array.isArray(target) ? 'length' : ITERATE_KEY);
       return Reflect.ownKeys(target);
     },
     set(target, key, newVal, receiver) {
+      console.log('set', key);
       if (isReadonly) {
         console.warn(`属性${key}只读。`);
         return;
       }
       const oldVal = target[key];
       const type = Array.isArray(target)
-        ? // 代理目标是数组
-          // key 为索引值, 索引值小于数组长度则为'SET', 否则为 'ADD'
-          // key 为length, Number(key)为NaN, 肯定为false, 即为'ADD'
-          Number(key) < target.length
+        ? Number(key) < target.length
           ? 'SET'
           : 'ADD'
         : Object.prototype.hasOwnProperty.call(target, key)
@@ -85,7 +93,6 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
         console.warn(`属性${key}只读。`);
         return;
       }
-
       const hadKey = Object.prototype.hasOwnProperty(target, key);
       const res = Reflect.deleteProperty(target, key);
       if (hadKey && res) {
@@ -97,7 +104,7 @@ function createReactive(obj, isShallow = false, isReadonly = false) {
 }
 
 function track(target, key) {
-  if (!activeEffect) return;
+  if (!activeEffect || !shouldTrack) return; // 禁止追踪则直接返回
   let depsMap = bucket.get(target);
   if (!depsMap) {
     bucket.set(target, (depsMap = new Map()));
@@ -113,18 +120,16 @@ function track(target, key) {
 function trigger(target, key, type, newVal) {
   const depsMap = bucket.get(target);
   if (!depsMap) return;
-  const effects = depsMap.get(key); // 当前属性关联的副作用函数
+  const effects = depsMap.get(key);
 
-  const effectsToRun = new Set(); // 待执行的副作用函数集合[属性关联、迭代相关、数组相关]
+  const effectsToRun = new Set();
   effects &&
     effects.forEach((effectFn) => {
       if (effectFn !== activeEffect) {
         effectsToRun.add(effectFn);
       }
     });
-
   if (['ADD', 'DELETE'].includes(type)) {
-    // 与当前对象迭代操作相关的副作用函数
     const iterateEffects = depsMap.get(ITERATE_KEY);
     iterateEffects &&
       iterateEffects.forEach((effectFn) => {
@@ -133,9 +138,7 @@ function trigger(target, key, type, newVal) {
         }
       });
   }
-
   if (Array.isArray(target) && type === 'ADD') {
-    // 数组, 且类型为ADD; 执行length相关的副作用函数
     const lengthEffects = depsMap.get('length');
     lengthEffects &&
       lengthEffects.forEach((effectFn) => {
@@ -144,13 +147,9 @@ function trigger(target, key, type, newVal) {
         }
       });
   }
-
   if (Array.isArray(target) && key === 'length') {
-    // 数组, 且修改了length
-    // 把所有相关联的副作用函数取出并添加到待执行集合中
     depsMap.forEach((effects, key) => {
       if (key >= newVal) {
-        // 索引大于或等于新length值的元素
         effects.forEach((effectFn) => {
           if (effectFn !== activeEffect) {
             effectsToRun.add(effectFn);
@@ -159,7 +158,6 @@ function trigger(target, key, type, newVal) {
       }
     });
   }
-
   effectsToRun.forEach((effectFn) => {
     if (effectFn.options.scheduler) {
       effectFn.options.scheduler(effectFn);
@@ -195,12 +193,27 @@ function effect(fn, options = {}) {
   return effectFn;
 }
 
-const arr = reactive(['foo', 'bar']);
-
-effect(() => {
-  for (const key of arr) {
-    console.log(key);
-  }
+const arr = reactive([]);
+effect(function effectFn1() {
+  console.log('effectFn1 push...');
+  arr.push('1');
 });
-arr[1] = 'bar2';
-// arr.length = 0
+// 读取length属性、设置索引0的值、设置length的值
+// get length => track
+// set key '0', 无‘0’副作用函数; 数组新增导致length改变, 但activeEffect和effectFn1一致,也不执行
+// set 'length', 数组长度和length值一样都为1, 值未改变、不执行trigger函数
+
+// 此时桶中关系
+// arr -> length -> effectFn1
+
+effect(function effectFn2() {
+  console.log('effectFn2 push...');
+  arr.push('2');
+});
+// 此时桶中关系
+// arr -> length -> effectFn1/effectFn2
+// set key '1', 无'1'副作用函数; 但是数组新增导致length改变, 触发length相关的副作用函数, 而activeEffect和effectFn2一样, 只会执行effectFn1副作用函数。
+// 此时effectFn2未执行完, 又执行effectFn1函数; 而effectFn1函数又会执行以上逻辑
+// Q1导致栈溢出
+
+// push方法调用时会间接读取length属性。而该方法在语义上是修改操作、非读取操作, 应该避免追踪length属性。
