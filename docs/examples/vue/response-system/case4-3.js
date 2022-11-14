@@ -1,4 +1,5 @@
 // 1. 分支切换、遗留副作用函数
+// 2. 无限循环
 
 const bucket = new WeakMap();
 let activeEffect; // 全局变量存储被注册的副作用函数
@@ -39,7 +40,7 @@ function trigger(target, key) {
   // effects && effects.forEach(fn => {
   //   console.log('....')
   //   fn()
-  // }) // 导致无限循环
+  // }) // 2. 导致无限循环
 
   const effectsToRun = new Set(effects); // 避免无限循环
   effectsToRun.forEach((effectFn) => effectFn());

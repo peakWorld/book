@@ -1,5 +1,5 @@
 // 1. 嵌套effect
-// 2. 无限递归循环
+// 2. 作用栈溢出
 
 const bucket = new WeakMap();
 let activeEffect;
@@ -85,7 +85,7 @@ function cleanup(effectFn) {
 // })
 // obj.foo = false
 
-// 无限递归循环
+// 作用栈溢出
 effect(() => {
   obj.foo++;
 });
