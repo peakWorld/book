@@ -5,6 +5,15 @@ function createRender(options) {
 
   function mountElement(vnode, contaier) {
     const el = createElement(vnode.type);
+
+    // props属性存在才处理
+    if (vnode.props) {
+      for (const key in vnode.props) {
+        // 将属性设置到元素上
+        el.setAttribute(key, vnode.props[key]);
+      }
+    }
+
     if (typeof vnode.children === 'string') {
       setElementText(el, vnode.children);
     } else if (Array.isArray(vnode.children)) {
@@ -36,10 +45,13 @@ function createRender(options) {
 }
 
 const vnode = {
+  // 节点类型
   type: 'div',
+  // 节点属性
   props: {
     id: 'foo',
   },
+  // 子节点
   children: [
     {
       type: 'p',
