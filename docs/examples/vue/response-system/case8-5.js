@@ -19,7 +19,68 @@ function createRender(options) {
     insert(el, contaier);
   }
 
-  function patchElement() {}
+  function patchElement(oldVNode, newVNode) {
+    // 将el赋值给newVNode
+    const el = (newVNode.el = oldVNode.el);
+    const oldProps = n1.props;
+    const newProps = n2.props;
+    // 第一步: 更新props
+    for (const key in newProps) {
+      // 更新newProps中的新键、与newProps中值不同的键
+      if (newProps[key] !== oldProps[key]) {
+        patchProps(el, key, oldProps[key], newProps[key]);
+      }
+    }
+    for (const key in oldProps) {
+      // 清除oldProps中存在, 但newProps中不存在的键
+      if (!(key in newProps)) {
+        patchProps(el, key, oldProps[key], nll);
+      }
+    }
+    // 第二步: 更新 children
+    patchChild(oldVNode, newVNode, el);
+  }
+
+  function patchChild(oldVNode, newVNode, contaier) {
+    // 针对新子节点的三种类型分别处理
+
+    if (typeof newVNode.children === 'string') {
+      // 类型一: 新子节点的类型为文本节点
+
+      // 旧子节点存在三种情况: 没有子节点、文本子节点、一组子节点
+      // 只有当旧子节点为一组子节点时, 需要逐个卸载
+      if (Array.isArray(oldVNode.children)) {
+        oldVNode.children.forEach((c) => unmount(c));
+      }
+      setElementText(contaier, newVNode.children);
+    } else if (Array.isArray(newVNode.children)) {
+      // 类型二: 新子节点是一组子节点
+
+      // 旧子节点为一组子节点
+      if (Array.isArray(oldVNode.children)) {
+        // 新旧子节点都是一组子节点, Diff算法
+        // TODO
+
+        // back: 卸载旧的一组子节点, 挂载新的一组子节点
+        oldVNode.children.forEach((c) => unmount(c));
+        newVNode.children.forEach((c) => patch(null, c, contaier));
+      } else {
+        // 旧节点要么是文本子节点、要么为空; 清空容器, 逐个挂载新的一组子节点
+        setElementText(contaier, '');
+        newVNode.children.forEach((c) => patch(null, c, contaier));
+      }
+    } else {
+      // 类型三: 新子节点不存在
+
+      if (Array.isArray(oldVNode.children)) {
+        // 旧子节点为一组子节点 逐个卸载
+        oldVNode.children.forEach((c) => unmount(c));
+      } else if (typeof oldVNode.children === 'string') {
+        // 旧节点为文本子节点, 清空内容
+        setElementText(contaier, '');
+      }
+    }
+  }
 
   function patch(oldVNode, newVNode, contaier) {
     if (oldVNode && oldVNode.type !== newVNode.type) {
@@ -74,8 +135,6 @@ const renderer = createRender({
       if (nextValue) {
         if (!invoker) {
           invoker = el._vei[key] = (e) => {
-            // e.timeStamp 事件发生的时间
-            // 如果事件发生的时间早于事件处理函数绑定的时间, 则不执行事件处理函数
             if (e.timeStamp < invoker.attached) return;
             if (Array.isArray(invoker.value)) {
               invoker.value.forEach((fn) => fn(e));
@@ -84,7 +143,7 @@ const renderer = createRender({
             }
           };
           invoker.value = nextValue;
-          invoker.attached = performance.now(); // 存储事件处理函数被绑定的时间
+          invoker.attached = performance.now();
           el.addEventListener(name, invoker);
         } else {
           invoker.value = nextValue;
@@ -139,14 +198,3 @@ effect(() => {
   };
   renderer.render(vnode, document.getElementById('app'));
 });
-
-// Q1 首次渲染完成后, 用鼠标点击p元素, 会触发父级div元素的click事件的事件处理函数执行吗？
-// 理论是不会的, 但实际上会执行(patchElement 还未实现)
-
-// p回调函数调用(宏任务), 执行语句 bol.value = true, 触发更新操作, 渲染器逻辑执行(宏任务执行完成后), 才会进行冒泡处理。
-// 即div元素绑定事件处理函数发生在事件冒泡之前。
-
-// A1 将绑定事件动作挪到事件冒泡之后？ 不行, 无法知晓事件冒泡的进行程度。
-// A2 在异步微任务队列中进行vuejs更新？无法避免, 微任务会穿插在由事件冒泡触发的多个事件处理函数之间被执行(绑定事件动作放到微任务中也无法避免)
-
-// A 屏蔽所有绑定时间晚于事件触发时间的事件处理函数的执行。【理解: 在事件触发该宏任务执行期间 绑定的事件处理函数都不执行】
