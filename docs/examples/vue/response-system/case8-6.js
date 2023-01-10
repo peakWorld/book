@@ -1,8 +1,19 @@
 const { effect, ref } = VueReactivity;
 
+const Text = Symbol();
+const Comment = Symbol();
+const Fragment = Symbol();
+
 function createRender(options) {
-  const { createElement, setElementText, insert, patchProps, unmount } =
-    options;
+  const {
+    createElement,
+    setElementText,
+    insert,
+    patchProps,
+    unmount,
+    createText,
+    setText,
+  } = options;
 
   function mountElement(vnode, contaier) {
     const el = (vnode.el = createElement(vnode.type));
@@ -69,13 +80,34 @@ function createRender(options) {
     }
     const { type } = newVNode;
     if (typeof type === 'string') {
+      /* 标签类型 */
       if (!oldVNode) {
         mountElement(newVNode, contaier);
       } else {
         patchElement(oldVNode, newVNode);
       }
-    } else if (typeof type === 'object') {
-    } else if (type === 'xxx') {
+    } else if (type === Text) {
+      /* 文本类型 */
+      if (!oldVNode) {
+        // 没有旧节点
+        const el = (newVNode.el = createText(newVNode.children));
+        insert(el, contaier);
+      } else {
+        // 有旧节点, 更新文本内容
+        const el = (newVNode.el = oldVNode.el);
+        if (oldVNode.children !== newVNode.children) {
+          setText(el, newVNode.children);
+        }
+      }
+    } else if (type === Fragment) {
+      /* Fragment类型 */
+      if (!oldVNode) {
+        // 没有旧节点, 逐个挂载children节点
+        newVNode.children.forEach((c) => patch(null, c, contaier));
+      } else {
+        // 有旧节点, 更新children
+        patchChild(oldVNode, newVNode, contaier);
+      }
     }
   }
 
@@ -106,6 +138,17 @@ const renderer = createRender({
   },
   insert(el, parent, anchor = null) {
     parent.insertBefore(el, anchor);
+  },
+  createText(text) {
+    // 创建文本节点
+    return document.createTextNode(text);
+  },
+  setText(el, text) {
+    el.nodeValue = text;
+  },
+  createComment(comment) {
+    // 创建注释节点
+    return document.createComment(comment);
   },
   patchProps(el, key, preValue, nextValue) {
     if (/^on/.test(key)) {
@@ -145,7 +188,11 @@ const renderer = createRender({
     }
   },
   unmount(vnode) {
-    const parent = vnode.el.parent;
+    // Fragment类型, 需要逐个卸载children
+    if (vnode.type === Fragment) {
+      vnode.children.forEach((c) => unmount(c));
+    }
+    const parent = vnode.el.parentNode;
     if (parent) {
       parent.removeChild(vnode.el);
     }

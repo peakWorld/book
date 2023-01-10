@@ -165,7 +165,7 @@ const renderer = createRender({
     }
   },
   unmount(vnode) {
-    const parent = vnode.el.parent;
+    const parent = vnode.el.parentNode;
     if (parent) {
       parent.removeChild(vnode.el);
     }
