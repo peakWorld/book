@@ -15,7 +15,7 @@ function createRender(options) {
     setText,
   } = options;
 
-  function mountElement(vnode, contaier) {
+  function mountElement(vnode, contaier, anchor) {
     const el = (vnode.el = createElement(vnode.type));
     if (typeof vnode.children === 'string') {
       setElementText(el, vnode.children);
@@ -27,7 +27,7 @@ function createRender(options) {
         patchProps(el, key, null, vnode.props[key]);
       }
     }
-    insert(el, contaier);
+    insert(el, contaier, anchor);
   }
 
   function patchElement(oldVNode, newVNode) {
@@ -56,11 +56,52 @@ function createRender(options) {
       setElementText(contaier, newVNode.children);
     } else if (Array.isArray(newVNode.children)) {
       if (Array.isArray(oldVNode.children)) {
-        // 新旧子节点都是一组子节点, Diff算法
-        // TODO
-        // back: 卸载旧的一组子节点, 挂载新的一组子节点
-        oldVNode.children.forEach((c) => unmount(c));
-        newVNode.children.forEach((c) => patch(null, c, contaier));
+        const oldChildren = oldVNode.children;
+        const newChildren = newVNode.children;
+        let lastIndex = 0;
+        for (let i = 0; i < newChildren.length; i++) {
+          const newVNode = newChildren[i];
+          let find = false; // 旧的一组子节点中是否存在可复用组件
+          for (let j = 0; j < oldChildren.length; j++) {
+            const oldVNode = oldChildren[j];
+            if (newVNode.key === oldVNode.key) {
+              // 一旦找到可复用的节点, 则将变量find的值设为true
+              find = true;
+              patch(oldVNode, newVNode, contaier);
+              if (j < lastIndex) {
+                const preVNode = newChildren[i - 1];
+                if (!preVNode) {
+                  const anchor = preVNode.el.nextSibling;
+                  insert(newVNode.el, contaier, anchor);
+                }
+              } else {
+                lastIndex = j;
+              }
+              break;
+            }
+          }
+          // newVNode是新增节点、需要挂载; 没有可复用组建
+          if (!find) {
+            const preVNode = newChildren[i - 1];
+            let anchor = null; // 获取锚点元素
+            if (preVNode) {
+              anchor = preVNode.el.nextSibling; // 前一个vnode节点的下一个兄弟元素
+            } else {
+              anchor = contaier.firstChild; // 容器的首元素
+            }
+            patch(null, newVNode, contaier, anchor); // 新元素不需要做比较, 直接挂载就行
+          }
+        }
+
+        // newChildren完成更新后; 遍历旧的一组子节点, 删除遗留的节点
+        for (let i = 0; i < oldChildren.length; i++) {
+          const oldVNode = oldChildren[i];
+          const has = newChildren.find((v) => v.key === oldVNode.key);
+          if (!has) {
+            // 在newChildren中没有相同key值的节点, 即该节点没有被复用, 需要删除该节点
+            unmount(oldVNode);
+          }
+        }
       } else {
         setElementText(contaier, '');
         newVNode.children.forEach((c) => patch(null, c, contaier));
@@ -76,7 +117,7 @@ function createRender(options) {
 
   // 区分节点类型, 做相应处理
   // contaier 是新元素将要用到的dom节点
-  function patch(oldVNode, newVNode, contaier) {
+  function patch(oldVNode, newVNode, contaier, anchor) {
     if (oldVNode && oldVNode.type !== newVNode.type) {
       unmount(oldVNode);
       oldVNode = null;
@@ -85,7 +126,7 @@ function createRender(options) {
     if (typeof type === 'string') {
       /* 标签类型 */
       if (!oldVNode) {
-        mountElement(newVNode, contaier);
+        mountElement(newVNode, contaier, anchor);
       } else {
         patchElement(oldVNode, newVNode);
       }
@@ -200,31 +241,4 @@ const renderer = createRender({
       parent.removeChild(vnode.el);
     }
   },
-});
-
-const bol = ref(false);
-
-effect(() => {
-  const vnode = {
-    type: 'div',
-    props: bol.value
-      ? {
-          onClick: () => console.log('div'),
-        }
-      : {},
-    children: [
-      {
-        type: 'p',
-        props: {
-          id: 'pp',
-          onClick: () => {
-            bol.value = true;
-            console.log('p');
-          },
-        },
-        children: 'text',
-      },
-    ],
-  };
-  renderer.render(vnode, document.getElementById('app'));
 });
