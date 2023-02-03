@@ -16,7 +16,7 @@ function patchChild(oldVNode, newVNode, contaier) {
             patch(oldVNode, newVNode, contaier);
             if (j < lastIndex) {
               const preVNode = newChildren[i - 1];
-              if (!preVNode) {
+              if (preVNode) {
                 const anchor = preVNode.el.nextSibling;
                 insert(newVNode.el, contaier, anchor);
               }

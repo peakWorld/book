@@ -18,9 +18,9 @@ function patchChild(oldVNode, newVNode, contaier) {
             if (j < lastIndex) {
               // newVNode节点对应的真实DOM需要移动;
               // 获取newVNode的前一个vnode, 即preVNode; 该节点已做过处理, 处于正确位置
-              const preVNode = newChildren[i - 1];
               // 如果preVNode不存在, 则newVNode是第一个节点, 不需要移动
-              if (!preVNode) {
+              const preVNode = newChildren[i - 1];
+              if (preVNode) {
                 // 将newVNode对应的真实DOM移动到preVNode所对应真实DOM后面
                 // 获取preVNode对应真实DOM的下一个兄弟节点, 并作为锚点
                 const anchor = preVNode.el.nextSibling;
