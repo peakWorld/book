@@ -109,12 +109,12 @@ function patchKeyedChildren(oldVNode, newVNode, contaier) {
 
 // oldChildren
 [
-  { type: 'p', children: '1', key: 1 },
-  { type: 'p', children: '2', key: 2 },
-  { type: 'p', children: '3', key: 3 },
-  { type: 'p', children: '4', key: 4 },
-  { type: 'p', children: '6', key: 6 },
-  { type: 'p', children: '5', key: 5 },
+  { type: 'p', children: '1', key: 1 }, // 0
+  { type: 'p', children: '2', key: 2 }, // 1
+  { type: 'p', children: '3', key: 3 }, // 2
+  { type: 'p', children: '4', key: 4 }, // 3
+  { type: 'p', children: '6', key: 6 }, // 4
+  { type: 'p', children: '5', key: 5 }, // 5
 ];
 // newChildren
 [
