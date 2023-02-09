@@ -53,7 +53,7 @@ function patchChild(oldVNode, newVNode, contaier) {
 [
   { type: 'p', children: 'text 1', key: 1 }, // 可复用节点在旧子节点中索引 0
   { type: 'p', children: 'text 2', key: 2 }, // 可复用节点 1
-  { type: 'p', children: 'text 3', key: 3 }, // 可复用节点 1
+  { type: 'p', children: 'text 3', key: 3 }, // 可复用节点 2
 ];
 
 // 2. 非递增序列

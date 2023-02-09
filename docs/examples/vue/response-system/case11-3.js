@@ -93,6 +93,7 @@ function patchKeyedChildren(oldVNode, newVNode, contaier) {
           patch(null, newVNode, contaier, anchor);
         } else if (i !== seq[s]) {
           // 如果节点的索引i不等于seq[s]的值, 说明该节点需要移动
+          // 此时i后续的节点已正确排序, 以i+1节点为锚点
           const pos = i + newStart;
           const newVNode = newChildren[pos];
           const nextPos = pos + 1;

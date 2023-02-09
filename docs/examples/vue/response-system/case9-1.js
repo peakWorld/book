@@ -73,7 +73,7 @@ function patchChild(oldVNode, newVNode, contaier) {
 [
   { type: 'p', children: '3', key: 3 },
   { type: 'p', children: '1', key: 1 },
-  { type: 'p', children: '2', key: 2 },
+  { type: 'p', children: 'text 2', key: 2 },
 ];
 
 // 注: DOM可复用并不意味着不需要更新 => 即使key和type相同, 文本内容还是发生了改变。

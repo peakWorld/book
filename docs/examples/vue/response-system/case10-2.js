@@ -304,7 +304,7 @@ const renderer = createRender({
   { type: 'p', children: 'text 3', key: 3 },
 ];
 
-// 比较的四个步骤
+// 比较的四个步骤-
 // 1. 比较oldChildren的第一个节点p-1与newChildren的第一个节点p-2; key不同不可复用, 不做处理。
 // 2. 比较oldChildren的最后一个节点p-4与newChildren的最后一个节点p-3; key不同不可复用, 不做处理。
 // 3. 比较oldChildren的第一个节点p-1与newChildren的最后一个节点p-3; key不同不可复用, 不做处理。

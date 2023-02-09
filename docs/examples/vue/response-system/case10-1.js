@@ -105,7 +105,7 @@ function createRender(options) {
       } else if (oldStartVNode.key === newEndVNode.key) {
         // 第三步 旧一 和 新最后比较
         patch(oldStartVNode, newEndVNode, contaier);
-        // 移动DOM擦操 oldStartVNode.el移动到oldEndVNode.el后面去
+        // 移动DOM操作 oldStartVNode.el移动到oldEndVNode.el后面去
         insert(oldStartVNode.el, contaier, oldEndVNode.el.nextSibling);
         // 更新索引
         oldEndVNode = oldChildren[++oldStartIdx];
@@ -114,7 +114,7 @@ function createRender(options) {
         // 第四步 旧最后 和 新一比较
         // 打补丁
         patch(oldEndVNode, newStartVNode, contaier);
-        // 移动DOM擦操作 oldEndVNode.el移动到oldStartVNode.el前面去
+        // 移动DOM操作 oldEndVNode.el移动到oldStartVNode.el前面去
         insert(oldEndVNode.el, contaier, oldStartVNode.el);
         // 更新索引
         oldEndVNode = oldChildren[--oldEndIdx];
@@ -290,7 +290,7 @@ const renderer = createRender({
 // oldChildren的头部索引值p-1、尾部索引值p-2
 // newChildren的头部索引值p-2、尾部索引值p-1
 
-// 第三步满足
+// 第三步满足？
 // => 3.1 节点p-1原本是头部节点, 但在新的顺序中变成了尾部节点。
 // => 3.2 将节点p-1的真实DOM元素移动到oldChildren尾部节点p-2的DOM后面。
 
