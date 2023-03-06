@@ -84,7 +84,7 @@ function computed(getter) {
   let dirty = true; // 是否为脏数据, 脏数据需要重新执行获取数据
 
   const effectFn = effect(getter, {
-    lazy: true,
+    lazy: true, // effect初始化时, lazy: true 则不执行
     scheduler() {
       // 赋值(响应式数据设置操作)才会执行该调度, dirty重新设置为true; 此处不必执行副作用函数
       if (!dirty) {

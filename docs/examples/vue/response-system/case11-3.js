@@ -81,6 +81,7 @@ function patchKeyedChildren(oldVNode, newVNode, contaier) {
       // i 新的一组子节点(排除预处理节点后的新子节点组)中最后一个节点
       let i = count - 1;
       // 从后往前处理新的一组子节点
+      // 此时i后续的节点已正确排序, 以i+1节点为锚点
       for (i; i >= 0; i--) {
         if (source[i] === -1) {
           // 说明索引为i的节点是全新的节点, 将其挂载
@@ -93,7 +94,6 @@ function patchKeyedChildren(oldVNode, newVNode, contaier) {
           patch(null, newVNode, contaier, anchor);
         } else if (i !== seq[s]) {
           // 如果节点的索引i不等于seq[s]的值, 说明该节点需要移动
-          // 此时i后续的节点已正确排序, 以i+1节点为锚点
           const pos = i + newStart;
           const newVNode = newChildren[pos];
           const nextPos = pos + 1;
