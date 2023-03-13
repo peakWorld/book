@@ -49,6 +49,7 @@ function mountComponent(vnode, contaier, anchor) {
 const MyComponent = {
   name: 'MyComponent',
   render() {
+    // render函数返回的内容是 MyComponent中的模板经过编译后的内容
     return {
       type: 'div',
       children: '文本内容',
