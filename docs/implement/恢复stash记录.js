@@ -1,8 +1,8 @@
-const { exec } = require('child_process');
+const { exec } = require("child_process");
 
 function getStashIds() {
   return new Promise((resolve, reject) => {
-    exec('git fsck --lost-found', { encoding: 'utf8' }, (err, stdout) => {
+    exec("git fsck --lost-found", { encoding: "utf8" }, (err, stdout) => {
       if (err) {
         return reject(err);
       }
@@ -15,11 +15,11 @@ function getStashIds() {
 
 function taskGenertor(id) {
   return new Promise((resolve) => {
-    exec(`git show ${id}`, { encoding: 'utf8' }, (err, data) => {
+    exec(`git show ${id}`, { encoding: "utf8" }, (err, data) => {
       if (err) {
         return resolve();
       }
-      if (data.includes('vite')) {
+      if (data.includes("vite")) {
         resolve(id);
       } else {
         resolve();
@@ -29,9 +29,12 @@ function taskGenertor(id) {
 }
 
 (async () => {
+  const start = Date.now();
   const ids = await getStashIds();
   const checkedId = await Promise.all(ids.map((id) => taskGenertor(id)));
   console.log(checkedId.filter((it) => it));
+
+  console.log("time ==> ", Date.now() - start);
 })();
 
 // 查找到记录id, 恢复响应记录
