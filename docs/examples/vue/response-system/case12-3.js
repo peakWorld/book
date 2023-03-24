@@ -136,7 +136,7 @@
     // 创建渲染上下文对象, 实际是组件实例的代理
     // 除了自身数据、props外; 还要处理mehods、computed等选项中定义的数据和方法
     const renderContext = new Proxy(instance, {
-      set(t, k, r) {
+      get(t, k, r) {
         const { state, props } = t; // 获取组件自身状态与props属性
         if (state && k in state) {
           // 读取自身属性
@@ -148,7 +148,7 @@
           console.log('不存在');
         }
       },
-      get(t, k, v, r) {
+      set(t, k, v, r) {
         const { state, props } = t;
         if (state && k in state) {
           state[k] = v;

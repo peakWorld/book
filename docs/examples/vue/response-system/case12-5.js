@@ -59,7 +59,7 @@
 
     // 创建渲染上下文对象, 实际是组件实例的代理
     const renderContext = new Proxy(instance, {
-      set(t, k, r) {
+      get(t, k, r) {
         const { state, props } = t;
         if (state && k in state) {
           return state[k];
@@ -71,7 +71,7 @@
           console.log('不存在');
         }
       },
-      get(t, k, v, r) {
+      set(t, k, v, r) {
         const { state, props, slots } = t;
         // 在生命周期和渲染函数中通过this.$slots获取插槽内容
         if (k === '$slots') return slots;

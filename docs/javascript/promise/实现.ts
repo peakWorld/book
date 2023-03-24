@@ -103,10 +103,10 @@ class IPromise {
       typeof onRejected === 'function'
         ? onRejected
         : (err) => {
-            throw err;
-          };
+          throw err;
+        };
     const p2 = new IPromise((resolve, reject) => {
-      if (this.state === IPromise.FULFILLED) {
+      if (this.state === IPromise.FULFILLED) { // Promise状态已变更为FULFILLED
         setTimeout(() => {
           try {
             const x = onFulfilled(this.value);
@@ -117,7 +117,7 @@ class IPromise {
         }, 0);
       }
 
-      if (this.state === IPromise.REJECTED) {
+      if (this.state === IPromise.REJECTED) { // Promise状态已变更为REJECTED
         setTimeout(() => {
           try {
             const x = onRejected(this.reason);
@@ -128,7 +128,7 @@ class IPromise {
         }, 0);
       }
 
-      if (this.state === IPromise.PENDING) {
+      if (this.state === IPromise.PENDING) { // Promise状态还是PENDING; 异步
         this.onReslovedCallbacks.push(() => {
           setTimeout(() => {
             try {
