@@ -5,6 +5,25 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    /* 14-4.js */
+    .box { width: 100px; height: 100px; background-color: red; }
+    /* 添加一个进场动效: 从距离左边200px的位置1s内运动到距离左边0px的位置。 */
+    /* 进场-初始状态 */
+    .enter-from { transform: translateX(200px) }
+    /* 进场-结束状态 */
+    .enter-to { transform: translateX(0) }
+    /* 进场-运动过程 */
+    .enter-active { transition: transform 1s ease-in-out }
+
+    /* 离场-初始状态 */
+    .leave-from { transform: translateX(0) }
+    /* 离场-结束状态 */
+    .leave-to { transform: translateX(200px) }
+    /* 离场-运动过程 */
+    .leave-active { transition: transform 2s ease-out }
+
+  </style>
 </head>
 <body>
   <div id="app"></div>
@@ -20,5 +39,5 @@
   http服务启动 python3 -m http.server 8002
  -->
 <script src="https://unpkg.com/@vue/reactivity@3.0.5/dist/reactivity.global.js"></script>
-<script type="module" src="/response-system/case13-1.js"></script>
+<script type="module" src="/response-system/case14-4.js"></script>
 </html>
