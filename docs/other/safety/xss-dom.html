@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XSS</title>
+  <!-- http-server -p 8088 -->
+</head>
+<body>
+  <input id="input" />
+  <span id="text"></span>
+  <button id="btn">提交</button>
+</body>
+<script>
+  const input = document.getElementById('input')
+  const text = document.getElementById('text')
+  const btn = document.getElementById('btn')
+  btn.onclick = () => {
+    text.innerHTML = input.value
+  }
+
+  // 案例一 破坏页面结构
+  // <h1>123456</h1>
+
+  // 案例二 执行非法片段
+  // 注: HTML5中不会执行通过innerHTML插入的<script>标签
+  // <img src='x' onerror='alert(1)'>
+
+  // 解决方案
+  // 1、使用Vue/React等框架, 会对输入的内容进行转译
+  // 2、原生js方法进行主动转译
+  // const escapeHTML = str => str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+  // 3、https://security.tencent.com/index.php/blog/msg/107
+</script>
+</html>

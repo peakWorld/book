@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Csp</title>
+</head>
+<body>
+  <iframe  href="http://localhost:8089/csp.html"></iframe>
+
+  <script>
+    const isCommon = location.port
+    const ele = document.createElement('div')
+    if (isCommon) {
+      ele.innerHTML = 'isCommon'
+    } else {
+      ele.innerHTML = 'isNotCommon'
+    }
+    document.body.appendChild(ele)
+  </script>
+</body>
+</html>
