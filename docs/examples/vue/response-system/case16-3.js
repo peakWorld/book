@@ -35,9 +35,9 @@ function parseChildren(context, ancestors) {
     if (mode === TextModes.DATA || mode === TextModes.RCDATA) {
       if (mode === TextModes.DATA && source[0] === '<') {
         if (source[1] === '!') {
-          if (source.startWith('<!--')) {
+          if (source.startsWith('<!--')) {
             node = parseComment(context);
-          } else if (source.startWith('<![CDATA[')) {
+          } else if (source.startsWith('<![CDATA[')) {
             node = parseCDATA(context, ancestors);
           }
         } else if (source[1] === '/') {
@@ -46,7 +46,7 @@ function parseChildren(context, ancestors) {
         } else if (/[a-z]/i.test(source[1])) {
           node = parseElement(context, ancestors);
         }
-      } else if (source.startWith('{{')) {
+      } else if (source.startsWith('{{')) {
         node = parseInterpolation(context);
       }
     }
@@ -64,7 +64,7 @@ function parseChildren(context, ancestors) {
 function isEnd(context, ancestors) {
   if (!context.source) return true;
   for (let i = ancestors.length - 1; i >= 0; --i) {
-    if (context.source.startWith(`</${parent.tag}`)) {
+    if (context.source.startsWith(`</${ancestors[i].tag}`)) {
       return true;
     }
   }
@@ -87,7 +87,7 @@ function parseElement(context, ancestors) {
   element.children = parseChildren(context, ancestors);
   ancestors.pop();
 
-  if (context.source.startWith(`</${element.tag}`)) {
+  if (context.source.startsWith(`</${element.tag}`)) {
     parseTag(context, 'end');
   } else {
     console.error(`${element.tag} 标签缺少闭合标签`);
@@ -108,7 +108,7 @@ function parseTag(context, type = 'start') {
   advanceSpaces(); // 消费标签中无用的空白字符
 
   // 如果字符以 '/>' 开头, 则表明是一个自闭合标签
-  const isSelfClosing = context.source.startWith('/>');
+  const isSelfClosing = context.source.startsWith('/>');
   advanceBy(isSelfClosing ? 2 : 1);
 
   return {

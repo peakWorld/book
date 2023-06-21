@@ -47,4 +47,4 @@ function proxyRefs(target) {
 }
 const newObj2 = proxyRefs({ ...toRefs(obj) });
 
-newObj2.foo; // 不用再调用value
+newObj2.foo; // 不用再加上.value

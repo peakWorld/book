@@ -26,10 +26,10 @@ function parseChildren(context, ancestors) {
       // 只有DATA模式才支持标签节点的解析
       if (mode === TextModes.DATA && source[0] === '<') {
         if (source[1] === '!') {
-          if (source.startWith('<!--')) {
+          if (source.startsWith('<!--')) {
             // 注释
             node = parseComment(context);
-          } else if (source.startWith('<![CDATA[')) {
+          } else if (source.startsWith('<![CDATA[')) {
             node = parseCDATA(context, ancestors);
           }
         } else if (source[1] === '/') {
@@ -41,7 +41,7 @@ function parseChildren(context, ancestors) {
           // 标签
           node = parseElement(context, ancestors);
         }
-      } else if (source.startWith('{{')) {
+      } else if (source.startsWith('{{')) {
         // 解析插值
         node = parseInterpolation(context);
       }
@@ -63,7 +63,7 @@ function isEnd(context, ancestors) {
   if (!context.source) return true;
   // 与栈中所有节点做比较
   for (let i = ancestors.length - 1; i >= 0; --i) {
-    if (context.source.startWith(`</${parent.tag}`)) {
+    if (context.source.startsWith(`</${ancestors[i].tag}`)) {
       return true;
     }
   }
@@ -79,7 +79,7 @@ function parseElement(context, ancestors) {
   element.children = parseChildren(context, ancestors);
   ancestors.pop();
 
-  if (context.source.startWith(`</${element.tag}`)) {
+  if (context.source.startsWith(`</${element.tag}`)) {
     parseTag(context, 'end');
   } else {
     console.error(`${element.tag} 标签缺少闭合标签`);

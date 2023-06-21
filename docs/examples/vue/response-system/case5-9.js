@@ -21,9 +21,9 @@ let shouldTrack = false;
 ['push', 'pop', 'shift', 'unshift', 'splice'].forEach((method) => {
   const originMethod = Array.prototype[method];
   arrayInstrumentations[method] = function (...args) {
-    shouldTrack = false; // 在调用原始方法前, 禁止追踪
+    shouldTrack = false; // 在调用原始方法前, 禁止追踪; 在调用push时, 会读取length属性, 这些方法不track 属性length
     let res = originMethod.apply(this, args);
-    shouldTrack = true; // 在调用原始方法后, 允许追踪
+    shouldTrack = true; // 在调用原始方法后, 允许追踪; 这些方法调用结束后, 允许后续的track
     return res;
   };
 });

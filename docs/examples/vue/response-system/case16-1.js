@@ -31,10 +31,10 @@ function parseChildren(context, ancestors) {
       // 只有DATA模式才支持标签节点的解析
       if (mode === TextModes.DATA && source[0] === '<') {
         if (source[1] === '!') {
-          if (source.startWith('<!--')) {
+          if (source.startsWith('<!--')) {
             // 注释
             node = parseComment(context);
-          } else if (source.startWith('<![CDATA[')) {
+          } else if (source.startsWith('<![CDATA[')) {
             node = parseCDATA(context, ancestors);
           }
         } else if (source[1] === '/') {
@@ -43,7 +43,7 @@ function parseChildren(context, ancestors) {
           // 标签
           node = parseElement(context, ancestors);
         }
-      } else if (source.startWith('{{')) {
+      } else if (source.startsWith('{{')) {
         // 解析插值
         node = parseInterpolation(context);
       }
