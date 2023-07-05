@@ -48,14 +48,11 @@ function parseChildren(context, ancestors) {
         node = parseInterpolation(context);
       }
     }
-
     if (!node) {
       node = parseText(context);
     }
-
     nodes.push(node);
   }
-
   return nodes;
 }
 
@@ -153,12 +150,9 @@ function parseAttributes(context) {
       value = match[0];
       advanceBy(value.length);
     }
-
     advanceSpaces(); // 消费属性值后的空白字符
-
     props.push({ type: 'Attribute', name, value });
   }
-
   return props;
 }
 

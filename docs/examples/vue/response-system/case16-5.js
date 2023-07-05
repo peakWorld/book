@@ -21,3 +21,6 @@ function parseText(context) {
 
   return { type: 'Text', content };
 }
+
+// 待解码的文本内容, 是否作为属性值
+function decodeHtml(rawText, asAttr = false) {}
