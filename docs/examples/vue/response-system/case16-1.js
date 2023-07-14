@@ -12,7 +12,7 @@ function parse(str) {
     mode: TextModes.DATA,
   };
 
-  // 返回解析后得到的字节点
+  // 返回解析后得到的节点
   const nodes = parseChildren(context, []);
 
   return { type: 'Root', children: nodes };
