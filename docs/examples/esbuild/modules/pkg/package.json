@@ -1,0 +1,9 @@
+{
+  "name": "pkg",
+  "main": "./node-cjs.js",
+  "module": "./node-esm.js",
+  "browser": {
+    "./node-cjs.js": "./browser-cjs.js",
+    "./node-esm.js": "./browser-esm.js"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "mfoo",
+  "exports": {
+    "./case1": {
+      "import": "./imported1.mjs",
+      "require": "./required1.cjs",
+      "default": "./fallback1.js",
+      "browser": "./browser1.js",
+      "node": "./node1.js"
+    },
+    "./case2": {
+      "browser": "./browser2.js",
+      "node": "./node2.js",
+      "default": "./fallback2.js"
+    },
+    "./case3": {
+      "custom1": "./custom1.js",
+      "custom2": "./custom2.js",
+      "import": "./imported1.mjs",
+      "require": "./required1.cjs",
+      "default": "./fallback1.js",
+      "browser": "./browser1.js",
+      "node": "./node1.js"
+    },
+    "./case4": {
+      "browser": "./browser1.js",
+      "module": "./module.js",
+      "node": "./node1.js",
+      "default": "./fallback1.js"
+    }
+  }
+}

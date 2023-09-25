@@ -1,3 +1,8 @@
 node_modules/
+**/node_modules/
 _book
-简历投递.md
+**/.DS_Store
+
+**/out_*
+
+dist/
