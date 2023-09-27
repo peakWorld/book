@@ -678,3 +678,28 @@ function n(n){console.log(n)}function e(e,...n){window[e](...n)}e("logMessage","
 <!-- TODO -->
 
 # Build metadata
+
+## Analyze [Build] [11_1]
+<!-- 分析生成的meta文件 -->
+[Bundle Size Analyzer](https://esbuild.github.io/analyze/)
+
+# Logging
+
+## Color [Build & Transform] [12_1]
+启用或禁用 esbuild 在终端的 stderr 文件描述符中写入的错误和警告消息中的颜色。
+
+默认情况下，如果 stderr 是 TTY 会话，则自动启用颜色，否则自动禁用颜色。
+
+## Log level [Build & Transform] [12_1]
+1. silent：不显示任何日志输出。这是使用 JS 转换 API 时的默认日志级别。
+2. error：仅显示错误。
+3. warning：仅显示警告和错误。这是使用 JS 构建 API 时的默认日志级别。
+4. info：显示警告、错误和输出文件摘要。这是使用 CLI 时的默认日志级别。
+5. debug：记录来自 info 的所有内容以及一些可能帮助您调试损坏的捆绑包的其他消息。此日志级别会影响性能，某些消息可能是误报，因此默认情况下不显示此信息。
+6. verbose：这会生成大量的日志消息，用于调试文件系统驱动程序的问题。它并非用于一般用途。
+
+## Log limit [Build & Transform] [12_1]
+默认情况下，esbuild 在报告了10条消息后停止报告日志消息, 这样可以避免意外生成大量日志消息。
+
+## Format messages [Build & Transform] [12_2]
+使用formatMessages函数来自定义esbuild的日志记录方式, 可以在打印日志消息之前对其进行处理，或将其打印到控制台以外的地方.
