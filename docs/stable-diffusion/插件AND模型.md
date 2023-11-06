@@ -1,19 +1,3 @@
-# 插件
-
-[lobe-theme](https://github.com/lobehub/sd-webui-lobe-theme)
-[Tag自动补全](https://jihulab.com/xiaolxl_pub/a1111-sd-webui-tagcomplete.git)
-[sd-face-editor](https://jihulab.com/xiaolxl_pub/sd-face-editor.git)
-[sd-webui-check-tensors](https://jihulab.com/xiaolxl_pub/sd-webui-check-tensors.git)
-[ControlNet 插件](https://jihulab.com/xiaolxl_pub/sd-webui-controlnet.git)
-[sd-webui-prompt-all-in-one](https://jihulab.com/xiaolxl_pub/sd-webui-prompt-all-in-one.git)
-[sd-webui-supermerger](https://jihulab.com/xiaolxl_pub/sd-webui-supermerger.git)
-[dreambooth 扩展](https://jihulab.com/xiaolxl_pub/sd_dreambooth_extension.git)
-[数据集标签编辑器](https://jihulab.com/xiaolxl_pub/stable-diffusion-webui-dataset-tag-editor.git)
-[图库浏览器](https://jihulab.com/xiaolxl_pub/stable-diffusion-webui-images-browser.git)
-[简体中文语言包](https://jihulab.com/xiaolxl_pub/stable-diffusion-webui-localization-zh_CN.git)
-[stable-diffusion-webui-model-toolkit](https://jihulab.com/xiaolxl_pub/stable-diffusion-webui-model-toolkit.git)
-[Waifu Diffusion 1.4 标签器](https://jihulab.com/xiaolxl_pub/stable-diffusion-webui-wd14-tagger.git)
-
 # 模型
 [C站](https://civitai.com/models)
 
@@ -37,15 +21,61 @@
   - models/Lora
   - models/LyCORIS
 
-* lora
-- wget -O ChilloutMixss3.0.safetensors https://civitai.com/api/download/models/19219
-- wget -O ChilloutMixss.safetensors https://civitai.com/api/download/models/12876
+- wget -O ayanami_rei.safetensors https://civitai.com/api/download/models/10389
+
+* lora模型训练
+https://www.bilibili.com/video/BV148411c7U2/?spm_id_from=333.788&vd_source=45ec08ffb275ecf5a715685d67e52040
 
 ## ControlNet
 * 文件后缀 xx.safetensors
 * 路径地址 models/ControlNet
 
+- wget -O control_v11p_sd15_openpose.pth https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_openpose.pth
+
+- wget -O control_v11p_sd15_normalbae.pth https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_normalbae.pth
 
 ## VAE[美化模型, 提高画面亮度]
 * 文件后缀 xx.pt | xx.safetensors
 * 路径地址 models/VAE
+
+
+## sd1.5
+* 二次元模型
+- Anything系列
+- Hassaku系列
+
+* 写实
+- Chilloutmix/Chikmix<CHECKPOINT>
+- Photon<CHECKPOINT>
+- majicMIX realistic<CHECKPOINT>
+
+* 2.5D
+- GuoFeng3.2<CHECKPOINT>
+
+* 游戏
+- Game Icon Institute_mode<CHECKPOINT>
+
+* ReV Animated<CHECKPOINT>/blindbox<lora>
+
+- Detail Tweaker LoRA<lora>（细节调整）
+- epi_noiseoffset<lora>（增强光影）
+
+## sdxl
+
+
+
+- DreamShaper XL1.0<CHECKPOINT>: 写实风大模型
+- LEOSAM's HelloWorld<CHECKPOINT>: 肖像/电影风格
+- Anime Art Diffusion XL<CHECKPOINT>: 动漫风模型
+- SDXL_Niji_Special Edition<CHECKPOINT>: 卡通大模型
+- Mysterious - SDXL<CHECKPOINT>: 奇幻风格大模型
+- DynaVision XL<CHECKPOINT>: 3D特化模型/动物
+- RongHua | 容华 | 国风大模型<CHECKPOINT>
+
+
+* lora 模型
+- Papercut SDXL<lora>: 剪纸风
+- Fashion Girl<lora>: 人物
+- hanfu tang SDXL<lora>: 汉服唐风
+- China Goddess Fashion<lora>: 敦煌风汉服
+- fat animal<lora>
